@@ -277,356 +277,344 @@
 </div>
 
 <script>
-    // ============ SUPABASE CONFIG ============
-    const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
-    
-    const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    const POOL_ADDRESS = "0x88ce80898A03d83a8519e2a43a96c0e8Fc0f8CA9";
-    const ENTRY_FEE = "0.00005";
-    
-    let userAddress = null;
-    let hasEntered = false;
-    let currentScore = 0;
-    let gameRunning = false;
-    let gameLoopId = null;
-    
-    // Game Variables
-    let bird = { x: 60, y: 300, velocity: 0, radius: 14 };
-    let pipes = [], frameCount = 0;
-    let gravity = 0.2, jumpPower = -4.8, pipeGap = 150, pipeWidth = 55, pipeInterval = 95;
-    
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    function getWeekNumber() {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 1);
-        const days = Math.floor((now - start) / (24*60*60*1000));
-        return Math.ceil(days / 7);
-    }
-    
-    function getWeekEnd() {
-        const now = new Date();
-        const end = new Date(now);
-        end.setDate(now.getDate() + (7 - now.getDay()));
-        end.setHours(23,59,59,999);
-        return end;
-    }
-    
-    async function loadGlobalLeaderboard() {
-        const weekNumber = getWeekNumber();
+    (function() {
+        // ============ SUPABASE CONFIG ============
+        const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
         
-        const { data, error } = await supabase
-            .from('scores')
-            .select('wallet_address, username, score')
-            .eq('week_number', weekNumber)
-            .order('score', { ascending: false })
-            .limit(10);
+        const supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        if (error) {
-            document.getElementById('leaderboardList').innerHTML = '<div class="loading">⚠️ Error loading leaderboard</div>';
-            return;
+        const POOL_ADDRESS = "0x88ce80898A03d83a8519e2a43a96c0e8Fc0f8CA9";
+        const ENTRY_FEE = "0.00005";
+        
+        let userAddress = null;
+        let hasEntered = false;
+        let currentScore = 0;
+        let gameRunning = false;
+        let gameLoopId = null;
+        
+        // Game Variables
+        let bird = { x: 60, y: 300, velocity: 0, radius: 14 };
+        let pipes = [], frameCount = 0;
+        let gravity = 0.2, jumpPower = -4.8, pipeGap = 150, pipeWidth = 55, pipeInterval = 95;
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function getWeekNumber() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const days = Math.floor((now - start) / (24*60*60*1000));
+            return Math.ceil(days / 7);
         }
         
-        const listDiv = document.getElementById('leaderboardList');
-        if (!data || data.length === 0) {
-            listDiv.innerHTML = '<div class="loading">✨ No players yet. Be the first!</div>';
-            return;
+        function getWeekEnd() {
+            const now = new Date();
+            const end = new Date(now);
+            end.setDate(now.getDate() + (7 - now.getDay()));
+            end.setHours(23,59,59,999);
+            return end;
         }
         
-        listDiv.innerHTML = data.map((s, i) => {
-            let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-            let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-            let isCurrent = s.wallet_address === userAddress;
-            let displayName = s.username || s.wallet_address.slice(0,8);
-            return `<div class="leaderboard-item ${isCurrent ? 'current-user' : ''}">
-                        <span class="${rankClass}" style="width: 40px;">${rankIcon}</span>
-                        <span style="flex:1;">${displayName}</span>
-                        <span style="color:#3B82F6; font-weight:bold;">${s.score}</span>
-                    </div>`;
-        }).join('');
-        
-        if (userAddress) {
-            const { data: allScores } = await supabase
+        async function loadGlobalLeaderboard() {
+            const weekNumber = getWeekNumber();
+            
+            const { data, error } = await supabaseClient
                 .from('scores')
-                .select('wallet_address, score')
+                .select('wallet_address, username, score')
                 .eq('week_number', weekNumber)
-                .order('score', { ascending: false });
+                .order('score', { ascending: false })
+                .limit(10);
             
-            const idx = allScores?.findIndex(s => s.wallet_address === userAddress);
-            if (idx !== undefined && idx !== -1) {
-                document.getElementById('yourRank').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${allScores[idx].score}`;
-                document.getElementById('yourRank').classList.remove('hidden');
+            if (error) {
+                document.getElementById('leaderboardList').innerHTML = '<div class="loading">⚠️ Error loading leaderboard</div>';
+                return;
             }
-        }
-        
-        await loadPrizePool();
-    }
-    
-    async function loadPrizePool() {
-        const weekNumber = getWeekNumber();
-        const { data, error } = await supabase
-            .from('scores')
-            .select('wallet_address')
-            .eq('week_number', weekNumber);
-        
-        const playerCount = data?.length || 0;
-        const totalPool = playerCount * 0.00005;
-        document.getElementById('prizePool').innerHTML = `${totalPool.toFixed(6)} ETH`;
-        
-        const formulaEl = document.getElementById('formulaText');
-        if (formulaEl && playerCount > 0) {
-            formulaEl.innerHTML = `📊 Current: ${playerCount} Players × 0.00005 ETH = ${totalPool.toFixed(6)} ETH`;
-        }
-    }
-    
-    async function loadPreviousWinners() {
-        const { data, error } = await supabase
-            .from('contests')
-            .select('*')
-            .eq('status', 'completed')
-            .order('created_at', { ascending: false })
-            .limit(3);
-        
-        const winnersDiv = document.getElementById('winnersList');
-        if (error || !data || data.length === 0) {
-            winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>';
-            return;
-        }
-        
-        winnersDiv.innerHTML = data.map(w => `
-            <div class="winner-item">
-                <div>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(6)} ETH</div>
-                ${w.winner2_address ? `<div>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(6)} ETH</div>` : ''}
-                <div style="font-size: 10px; color: #6B6B84;">Week ${w.week_number}</div>
-            </div>
-        `).join('');
-    }
-    
-    async function submitScoreToGlobal(score) {
-        const weekNumber = getWeekNumber();
-        const username = userAddress.slice(0,8);
-        
-        const { data: existing } = await supabase
-            .from('scores')
-            .select('score')
-            .eq('wallet_address', userAddress)
-            .eq('week_number', weekNumber)
-            .single();
-        
-        if (existing && score <= existing.score) {
-            return;
-        }
-        
-        if (existing) {
-            await supabase
-                .from('scores')
-                .update({ score: score, username: username, updated_at: new Date() })
-                .eq('wallet_address', userAddress)
-                .eq('week_number', weekNumber);
-        } else {
-            await supabase
-                .from('scores')
-                .insert({ wallet_address: userAddress, username: username, score: score, week_number: weekNumber });
-        }
-        
-        await loadGlobalLeaderboard();
-    }
-    
-    async function markEntry(txHash) {
-        const weekNumber = getWeekNumber();
-        
-        const { data: contest } = await supabase
-            .from('contests')
-            .select('id')
-            .eq('week_number', weekNumber)
-            .single();
-        
-        if (contest) {
-            await supabase
-                .from('entries')
-                .insert({ wallet_address: userAddress, contest_id: contest.id, paid_amount: 0.00005, paid_tx_hash: txHash });
             
-            const { data: entries } = await supabase
-                .from('entries')
-                .select('*')
-                .eq('contest_id', contest.id);
+            const listDiv = document.getElementById('leaderboardList');
+            if (!data || data.length === 0) {
+                listDiv.innerHTML = '<div class="loading">✨ No players yet. Be the first!</div>';
+                return;
+            }
             
-            await supabase
-                .from('contests')
-                .update({ total_players: entries.length, total_pool: entries.length * 0.00005 })
-                .eq('id', contest.id);
-        }
-        
-        hasEntered = true;
-        localStorage.setItem(`entered_${userAddress}`, 'true');
-        document.getElementById('entryBtn').disabled = true;
-        document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
-        document.getElementById('gameSection').classList.remove('hidden');
-        document.getElementById('gameLockedMsg').classList.add('hidden');
-        startGame();
-        await loadPrizePool();
-    }
-    
-    // ============ WALLET CONNECTION - IMPROVED ============
-    async function connectWallet() {
-        const statusDiv = document.getElementById('walletStatus');
-        statusDiv.innerHTML = '⏳ Checking for wallet...';
-        
-        // Check if MetaMask or any web3 wallet is installed
-        if (typeof window.ethereum === 'undefined') {
-            statusDiv.innerHTML = '❌ No wallet detected! Please install MetaMask or Coinbase Wallet. <a href="https://metamask.io/download/" target="_blank">Install MetaMask</a>';
-            return;
-        }
-        
-        try {
-            statusDiv.innerHTML = '⏳ Connecting to wallet...';
+            listDiv.innerHTML = data.map((s, i) => {
+                let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                let isCurrent = s.wallet_address === userAddress;
+                let displayName = s.username || s.wallet_address.slice(0,8);
+                return `<div class="leaderboard-item ${isCurrent ? 'current-user' : ''}">
+                            <span class="${rankClass}" style="width: 40px;">${rankIcon}</span>
+                            <span style="flex:1;">${displayName}</span>
+                            <span style="color:#3B82F6; font-weight:bold;">${s.score}</span>
+                        </div>`;
+            }).join('');
             
-            // Request account access
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = accounts[0];
-            
-            // Check if on Base chain (Chain ID: 8453)
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            const targetChainId = '0x2105'; // 8453 in hex
-            
-            if (chainId !== targetChainId) {
-                statusDiv.innerHTML = '⚠️ Please switch to Base chain in your wallet.';
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: targetChainId }]
-                    });
-                } catch (switchError) {
-                    statusDiv.innerHTML = '⚠️ Please manually switch to Base chain in your wallet.';
+            if (userAddress) {
+                const { data: allScores } = await supabaseClient
+                    .from('scores')
+                    .select('wallet_address, score')
+                    .eq('week_number', weekNumber)
+                    .order('score', { ascending: false });
+                
+                const idx = allScores?.findIndex(s => s.wallet_address === userAddress);
+                if (idx !== undefined && idx !== -1) {
+                    document.getElementById('yourRank').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${allScores[idx].score}`;
+                    document.getElementById('yourRank').classList.remove('hidden');
                 }
             }
             
-            // Display wallet address
-            const shortAddress = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-            document.getElementById('walletDisplay').innerHTML = shortAddress;
-            document.getElementById('walletConnectUI').classList.add('hidden');
-            document.getElementById('walletInfoUI').classList.remove('hidden');
-            statusDiv.innerHTML = '✅ Wallet connected!';
-            
-            // Check if already entered
+            await loadPrizePool();
+        }
+        
+        async function loadPrizePool() {
             const weekNumber = getWeekNumber();
-            const { data: existingEntry } = await supabase
-                .from('entries')
-                .select('*')
-                .eq('wallet_address', userAddress);
+            const { data, error } = await supabaseClient
+                .from('scores')
+                .select('wallet_address')
+                .eq('week_number', weekNumber);
             
-            if (existingEntry && existingEntry.length > 0) {
-                hasEntered = true;
-                document.getElementById('entryBtn').disabled = true;
-                document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
-                document.getElementById('gameSection').classList.remove('hidden');
-                document.getElementById('gameLockedMsg').classList.add('hidden');
-                startGame();
+            const playerCount = data?.length || 0;
+            const totalPool = playerCount * 0.00005;
+            document.getElementById('prizePool').innerHTML = `${totalPool.toFixed(6)} ETH`;
+            
+            const formulaEl = document.getElementById('formulaText');
+            if (formulaEl && playerCount > 0) {
+                formulaEl.innerHTML = `📊 Current: ${playerCount} Players × 0.00005 ETH = ${totalPool.toFixed(6)} ETH`;
+            }
+        }
+        
+        async function loadPreviousWinners() {
+            const { data, error } = await supabaseClient
+                .from('contests')
+                .select('*')
+                .eq('status', 'completed')
+                .order('created_at', { ascending: false })
+                .limit(3);
+            
+            const winnersDiv = document.getElementById('winnersList');
+            if (error || !data || data.length === 0) {
+                winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>';
+                return;
+            }
+            
+            winnersDiv.innerHTML = data.map(w => `
+                <div class="winner-item">
+                    <div>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(6)} ETH</div>
+                    ${w.winner2_address ? `<div>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(6)} ETH</div>` : ''}
+                    <div style="font-size: 10px; color: #6B6B84;">Week ${w.week_number}</div>
+                </div>
+            `).join('');
+        }
+        
+        async function submitScoreToGlobal(score) {
+            const weekNumber = getWeekNumber();
+            const username = userAddress.slice(0,8);
+            
+            const { data: existing } = await supabaseClient
+                .from('scores')
+                .select('score')
+                .eq('wallet_address', userAddress)
+                .eq('week_number', weekNumber)
+                .single();
+            
+            if (existing && score <= existing.score) {
+                return;
+            }
+            
+            if (existing) {
+                await supabaseClient
+                    .from('scores')
+                    .update({ score: score, username: username, updated_at: new Date() })
+                    .eq('wallet_address', userAddress)
+                    .eq('week_number', weekNumber);
+            } else {
+                await supabaseClient
+                    .from('scores')
+                    .insert({ wallet_address: userAddress, username: username, score: score, week_number: weekNumber });
             }
             
             await loadGlobalLeaderboard();
-            setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
-            
-        } catch(error) {
-            console.error("Connection error:", error);
-            statusDiv.innerHTML = `❌ Connection failed: ${error.message}`;
         }
-    }
-    
-    function disconnectWallet() {
-        userAddress = null;
-        hasEntered = false;
-        document.getElementById('walletConnectUI').classList.remove('hidden');
-        document.getElementById('walletInfoUI').classList.add('hidden');
-        document.getElementById('gameSection').classList.add('hidden');
-        document.getElementById('gameLockedMsg').classList.remove('hidden');
-        document.getElementById('walletStatus').innerHTML = '';
+        
+        async function markEntry(txHash) {
+            const weekNumber = getWeekNumber();
+            
+            const { data: contest } = await supabaseClient
+                .from('contests')
+                .select('id')
+                .eq('week_number', weekNumber)
+                .single();
+            
+            if (contest) {
+                await supabaseClient
+                    .from('entries')
+                    .insert({ wallet_address: userAddress, contest_id: contest.id, paid_amount: 0.00005, paid_tx_hash: txHash });
+                
+                const { data: entries } = await supabaseClient
+                    .from('entries')
+                    .select('*')
+                    .eq('contest_id', contest.id);
+                
+                await supabaseClient
+                    .from('contests')
+                    .update({ total_players: entries.length, total_pool: entries.length * 0.00005 })
+                    .eq('id', contest.id);
+            }
+            
+            hasEntered = true;
+            localStorage.setItem(`entered_${userAddress}`, 'true');
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
+            document.getElementById('gameSection').classList.remove('hidden');
+            document.getElementById('gameLockedMsg').classList.add('hidden');
+            startGame();
+            await loadPrizePool();
+        }
+        
+        // ============ WALLET CONNECTION ============
+        async function connectWallet() {
+            const statusDiv = document.getElementById('walletStatus');
+            statusDiv.innerHTML = '⏳ Checking for wallet...';
+            
+            if (typeof window.ethereum === 'undefined') {
+                statusDiv.innerHTML = '❌ No wallet detected! <a href="https://metamask.io/download/" target="_blank">Install MetaMask</a>';
+                return;
+            }
+            
+            try {
+                statusDiv.innerHTML = '⏳ Connecting...';
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const targetChainId = '0x2105';
+                
+                if (chainId !== targetChainId) {
+                    statusDiv.innerHTML = '⚠️ Please switch to Base chain';
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: targetChainId }]
+                        });
+                    } catch(e) {}
+                }
+                
+                const shortAddress = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+                document.getElementById('walletDisplay').innerHTML = shortAddress;
+                document.getElementById('walletConnectUI').classList.add('hidden');
+                document.getElementById('walletInfoUI').classList.remove('hidden');
+                statusDiv.innerHTML = '✅ Connected!';
+                
+                const { data: existingEntry } = await supabaseClient
+                    .from('entries')
+                    .select('*')
+                    .eq('wallet_address', userAddress);
+                
+                if (existingEntry && existingEntry.length > 0) {
+                    hasEntered = true;
+                    document.getElementById('entryBtn').disabled = true;
+                    document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
+                    document.getElementById('gameSection').classList.remove('hidden');
+                    document.getElementById('gameLockedMsg').classList.add('hidden');
+                    startGame();
+                }
+                
+                await loadGlobalLeaderboard();
+                setTimeout(() => { statusDiv.innerHTML = ''; }, 2000);
+                
+            } catch(error) {
+                statusDiv.innerHTML = `❌ ${error.message}`;
+            }
+        }
+        
+        function disconnectWallet() {
+            userAddress = null;
+            hasEntered = false;
+            document.getElementById('walletConnectUI').classList.remove('hidden');
+            document.getElementById('walletInfoUI').classList.add('hidden');
+            document.getElementById('gameSection').classList.add('hidden');
+            document.getElementById('gameLockedMsg').classList.remove('hidden');
+            document.getElementById('walletStatus').innerHTML = '';
+            loadGlobalLeaderboard();
+        }
+        
+        async function enterContest() {
+            if (!userAddress) { alert("Connect wallet first!"); return; }
+            if (hasEntered) { alert("Already entered!"); return; }
+            
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '⏳ Processing...';
+            
+            try {
+                const mockTxHash = "0x" + Math.random().toString(36).substring(2, 15);
+                setTimeout(async () => {
+                    await markEntry(mockTxHash);
+                    document.getElementById('entryStatus').innerHTML = '<div style="color:#3B82F6; margin-top:8px;">✅ Entry confirmed!</div>';
+                }, 1500);
+            } catch(e) {
+                document.getElementById('entryBtn').disabled = false;
+                document.getElementById('entryBtn').innerHTML = '💰 Pay 0.00005 ETH & Enter Contest';
+                document.getElementById('entryStatus').innerHTML = '<div style="color:#ff4444; margin-top:8px;">❌ Failed</div>';
+            }
+        }
+        
+        // ============ GAME FUNCTIONS ============
+        function initGame() { if(!hasEntered) return; bird = { x: 60, y: canvas.height/2, velocity: 0, radius: 14 }; pipes = []; frameCount = 0; currentScore = 0; gameRunning = true; document.getElementById('scoreDisplay').innerHTML = 'Score: 0'; }
+        function jump() { if(gameRunning) bird.velocity = jumpPower; }
+        function createPipe() { let minH=60, maxH=canvas.height-150-minH, topH=Math.random()*(maxH-minH)+minH; pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH+150, passed: false }); }
+        function updateGame() {
+            if(!gameRunning || !hasEntered) return;
+            bird.velocity += gravity; bird.y += bird.velocity;
+            if(bird.y-14<0 || bird.y+14>canvas.height) { gameOver(); return; }
+            frameCount++; if(frameCount>95) { createPipe(); frameCount=0; }
+            for(let i=0; i<pipes.length; i++) {
+                pipes[i].x -= 2.8;
+                if(!pipes[i].passed && pipes[i].x+55<bird.x) { pipes[i].passed=true; currentScore++; document.getElementById('scoreDisplay').innerHTML = `Score: ${currentScore}`; }
+                if(bird.x+14>pipes[i].x && bird.x-14<pipes[i].x+55 && (bird.y-14<pipes[i].topHeight || bird.y+14>pipes[i].bottomY)) { gameOver(); return; }
+                if(pipes[i].x+55<0) { pipes.splice(i,1); i--; }
+            }
+        }
+        function draw() {
+            ctx.fillStyle='#87CEEB'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle='#DEB887'; ctx.fillRect(0,canvas.height-50,canvas.width,50);
+            for(let p of pipes) {
+                ctx.fillStyle='#228B22'; ctx.fillRect(p.x,0,55,p.topHeight);
+                ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.topHeight-30,65,30);
+                ctx.fillStyle='#228B22'; ctx.fillRect(p.x,p.bottomY,55,canvas.height-p.bottomY);
+                ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.bottomY,65,30);
+            }
+            ctx.fillStyle='#3B82F6'; ctx.beginPath(); ctx.arc(bird.x,bird.y,14,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='#1E40AF'; ctx.beginPath(); ctx.arc(bird.x-2,bird.y-2,4,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,2,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='black'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,1,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='white'; ctx.font='bold 32px Arial'; ctx.fillText(currentScore,canvas.width/2-15,60);
+        }
+        function gameOver() { gameRunning=false; if(hasEntered && currentScore>0) submitScoreToGlobal(currentScore); document.getElementById('gameStatus').innerHTML = `💀 Game Over! Score: ${currentScore}. Tap to restart!`; }
+        function resetGame() { if(!hasEntered) return; initGame(); document.getElementById('gameStatus').innerHTML = 'Tap or SPACE to jump! Avoid pipes!'; }
+        function startGame() { if(!hasEntered) return; initGame(); if(gameLoopId) cancelAnimationFrame(gameLoopId); function loop() { updateGame(); draw(); gameLoopId = requestAnimationFrame(loop); } loop(); }
+        
+        function startTimer() {
+            function update() {
+                let diff = getWeekEnd() - new Date();
+                if(diff <= 0) { document.getElementById('endMessage').classList.remove('hidden'); return; }
+                let d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
+                document.getElementById('timeLeft').innerHTML = `${d}d ${h}h ${m}m`;
+                document.getElementById('weekBadge').innerHTML = `Week ${getWeekNumber()}`;
+            }
+            update(); setInterval(update, 60000);
+        }
+        
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnectWallet);
+        document.getElementById('entryBtn').addEventListener('click', enterContest);
+        document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); } });
+        canvas.addEventListener('click', () => { if(!gameRunning && hasEntered) resetGame(); jump(); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); });
+        
         loadGlobalLeaderboard();
-    }
-    
-    async function enterContest() {
-        if (!userAddress) { alert("Connect wallet first!"); return; }
-        if (hasEntered) { alert("Already entered this week!"); return; }
-        
-        document.getElementById('entryBtn').disabled = true;
-        document.getElementById('entryBtn').innerHTML = '⏳ Processing...';
-        
-        try {
-            // For demo: simulate transaction
-            // In production: use actual sendTransaction
-            const mockTxHash = "0x" + Math.random().toString(36).substring(2, 15);
-            
-            setTimeout(async () => {
-                await markEntry(mockTxHash);
-                document.getElementById('entryStatus').innerHTML = '<div style="color:#3B82F6; margin-top:8px;">✅ Entry confirmed!</div>';
-            }, 1500);
-            
-        } catch(e) {
-            document.getElementById('entryBtn').disabled = false;
-            document.getElementById('entryBtn').innerHTML = '💰 Pay 0.00005 ETH & Enter Contest';
-            document.getElementById('entryStatus').innerHTML = '<div style="color:#ff4444; margin-top:8px;">❌ Failed</div>';
-        }
-    }
-    
-    // ============ FLAPPY BIRD GAME ============
-    function initGame() { if(!hasEntered) return; bird = { x: 60, y: canvas.height/2, velocity: 0, radius: 14 }; pipes = []; frameCount = 0; currentScore = 0; gameRunning = true; document.getElementById('scoreDisplay').innerHTML = 'Score: 0'; }
-    function jump() { if(gameRunning) bird.velocity = jumpPower; }
-    function createPipe() { let minH=60, maxH=canvas.height-150-minH, topH=Math.random()*(maxH-minH)+minH; pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH+150, passed: false }); }
-    function updateGame() {
-        if(!gameRunning || !hasEntered) return;
-        bird.velocity += gravity; bird.y += bird.velocity;
-        if(bird.y-14<0 || bird.y+14>canvas.height) { gameOver(); return; }
-        frameCount++; if(frameCount>95) { createPipe(); frameCount=0; }
-        for(let i=0; i<pipes.length; i++) {
-            pipes[i].x -= 2.8;
-            if(!pipes[i].passed && pipes[i].x+55<bird.x) { pipes[i].passed=true; currentScore++; document.getElementById('scoreDisplay').innerHTML = `Score: ${currentScore}`; }
-            if(bird.x+14>pipes[i].x && bird.x-14<pipes[i].x+55 && (bird.y-14<pipes[i].topHeight || bird.y+14>pipes[i].bottomY)) { gameOver(); return; }
-            if(pipes[i].x+55<0) { pipes.splice(i,1); i--; }
-        }
-    }
-    function draw() {
-        ctx.fillStyle='#87CEEB'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle='#DEB887'; ctx.fillRect(0,canvas.height-50,canvas.width,50);
-        for(let p of pipes) {
-            ctx.fillStyle='#228B22'; ctx.fillRect(p.x,0,55,p.topHeight);
-            ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.topHeight-30,65,30);
-            ctx.fillStyle='#228B22'; ctx.fillRect(p.x,p.bottomY,55,canvas.height-p.bottomY);
-            ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.bottomY,65,30);
-        }
-        ctx.fillStyle='#3B82F6'; ctx.beginPath(); ctx.arc(bird.x,bird.y,14,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='#1E40AF'; ctx.beginPath(); ctx.arc(bird.x-2,bird.y-2,4,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,2,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='black'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,1,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='white'; ctx.font='bold 32px Arial'; ctx.fillText(currentScore,canvas.width/2-15,60);
-    }
-    function gameOver() { gameRunning=false; if(hasEntered && currentScore>0) submitScoreToGlobal(currentScore); document.getElementById('gameStatus').innerHTML = `💀 Game Over! Score: ${currentScore}. Tap to restart!`; }
-    function resetGame() { if(!hasEntered) return; initGame(); document.getElementById('gameStatus').innerHTML = 'Tap or SPACE to jump! Avoid pipes!'; }
-    function startGame() { if(!hasEntered) return; initGame(); if(gameLoopId) cancelAnimationFrame(gameLoopId); function loop() { updateGame(); draw(); gameLoopId = requestAnimationFrame(loop); } loop(); }
-    
-    function startTimer() {
-        function update() {
-            let diff = getWeekEnd() - new Date();
-            if(diff <= 0) { document.getElementById('timeLeft').innerHTML = 'Ended'; document.getElementById('endMessage').classList.remove('hidden'); return; }
-            let d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
-            document.getElementById('timeLeft').innerHTML = `${d}d ${h}h ${m}m`;
-            document.getElementById('weekBadge').innerHTML = `Week ${getWeekNumber()}`;
-        }
-        update(); setInterval(update, 60000);
-    }
-    
-    document.getElementById('connectBtn').addEventListener('click', connectWallet);
-    document.getElementById('disconnectBtn').addEventListener('click', disconnectWallet);
-    document.getElementById('entryBtn').addEventListener('click', enterContest);
-    document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); } });
-    canvas.addEventListener('click', () => { if(!gameRunning && hasEntered) resetGame(); jump(); });
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); });
-    
-    loadGlobalLeaderboard();
-    loadPreviousWinners();
-    startTimer();
+        loadPreviousWinners();
+        startTimer();
+    })();
 </script>
 </body>
 </html>
