@@ -207,8 +207,6 @@
         .hidden { display: none; }
         .loading { text-align: center; padding: 20px; color: #6B6B84; }
         #walletStatus { font-size: 12px; margin-top: 8px; padding: 8px; border-radius: 12px; }
-        .error-text { color: #ff6b6b; }
-        .success-text { color: #4caf50; }
     </style>
 </head>
 <body>
@@ -277,12 +275,20 @@
 </div>
 
 <script>
-    (function() {
+    // Wait for DOM and Supabase to load
+    window.addEventListener('DOMContentLoaded', function() {
+        // Check if supabase is loaded
+        if (typeof supabase === 'undefined') {
+            console.error('Supabase not loaded');
+            document.getElementById('leaderboardList').innerHTML = '<div class="loading">⚠️ Loading error. Please refresh.</div>';
+            return;
+        }
+        
         // ============ SUPABASE CONFIG ============
         const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
         
-        const supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const POOL_ADDRESS = "0x88ce80898A03d83a8519e2a43a96c0e8Fc0f8CA9";
         const ENTRY_FEE = "0.00005";
@@ -477,7 +483,7 @@
             statusDiv.innerHTML = '⏳ Checking for wallet...';
             
             if (typeof window.ethereum === 'undefined') {
-                statusDiv.innerHTML = '❌ No wallet detected! <a href="https://metamask.io/download/" target="_blank">Install MetaMask</a>';
+                statusDiv.innerHTML = '❌ No wallet detected! <a href="https://metamask.io/download/" target="_blank" style="color:#3B82F6;">Install MetaMask</a>';
                 return;
             }
             
@@ -487,7 +493,7 @@
                 userAddress = accounts[0];
                 
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const targetChainId = '0x2105';
+                const targetChainId = '0x2105'; // Base chain
                 
                 if (chainId !== targetChainId) {
                     statusDiv.innerHTML = '⚠️ Please switch to Base chain';
@@ -598,8 +604,10 @@
                 let diff = getWeekEnd() - new Date();
                 if(diff <= 0) { document.getElementById('endMessage').classList.remove('hidden'); return; }
                 let d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
-                document.getElementById('timeLeft').innerHTML = `${d}d ${h}h ${m}m`;
-                document.getElementById('weekBadge').innerHTML = `Week ${getWeekNumber()}`;
+                let timeLeftEl = document.getElementById('timeLeft');
+                let weekBadgeEl = document.getElementById('weekBadge');
+                if(timeLeftEl) timeLeftEl.innerHTML = `${d}d ${h}h ${m}m`;
+                if(weekBadgeEl) weekBadgeEl.innerHTML = `Week ${getWeekNumber()}`;
             }
             update(); setInterval(update, 60000);
         }
@@ -614,7 +622,7 @@
         loadGlobalLeaderboard();
         loadPreviousWinners();
         startTimer();
-    })();
+    });
 </script>
 </body>
 </html>
