@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BASED-FLAPPY | Weekly Contest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, #0A0A2A 0%, #030318 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .top-bar {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(10, 10, 35, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            flex: 1;
+        }
+
+        .card h3 {
+            color: #3B82F6;
+            margin-bottom: 15px;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* Leaderboard Items */
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .leaderboard-item.current-user {
+            background: rgba(59,130,246,0.2);
+            border-left: 3px solid #3B82F6;
+            border-radius: 12px;
+        }
+
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+
+        /* Winner Items */
+        .winner-item {
+            padding: 10px;
+            background: rgba(59,130,246,0.1);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .play-earn {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA, #93C5FD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        @media (min-width: 768px) {
+            .play-earn { font-size: 72px; }
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #8B8B9E;
+        }
+
+        /* Game Card */
+        .game-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .game-card {
+            background: rgba(10, 10, 35, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(59,130,246,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .game-title {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        canvas {
+            border-radius: 24px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            cursor: pointer;
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            border: 2px solid rgba(59,130,246,0.5);
+        }
+
+        .game-status {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: rgba(59,130,246,0.1);
+            border-radius: 30px;
+            font-size: 12px;
+            color: #93C5FD;
+        }
+
+        .current-score {
+            font-size: 28px;
+            font-weight: 800;
+            color: #3B82F6;
+            margin-top: 10px;
+        }
+
+        /* Prize Pool */
+        .prize-card {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(30,64,175,0.08));
+            border: 1px solid rgba(59,130,246,0.4);
+            border-radius: 24px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .prize-amount {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .prize-explanation {
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: 16px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        .formula {
+            background: rgba(0,0,0,0.3);
+            padding: 6px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 10px;
+            color: #60A5FA;
+            margin-top: 6px;
+        }
+
+        .reward-split {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(59,130,246,0.2);
+        }
+
+        .split { text-align: center; }
+        .split-icon { font-size: 18px; }
+        .split-percent { font-weight: 700; color: #3B82F6; font-size: 12px; }
+        .split-text { font-size: 8px; color: #8B8B9E; }
+
+        /* Buttons */
+        .connect-btn, .entry-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .connect-btn:active, .entry-btn:active { transform: scale(0.98); }
+        .entry-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(59,130,246,0.1);
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .stat-badge {
+            flex: 1;
+            background: rgba(59,130,246,0.1);
+            border-radius: 18px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .stat-value { font-size: 16px; font-weight: 700; color: #3B82F6; }
+        .stat-label { font-size: 8px; color: #8B8B9E; }
+
+        .your-rank {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(59,130,246,0.15);
+            border-radius: 18px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .end-message {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(59,130,246,0.1);
+            border-radius: 20px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .hidden { display: none; }
+        .loading { text-align: center; padding: 20px; color: #6B6B84; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="card">
+            <h3>🏆 PREVIOUS WINNERS</h3>
+            <div id="winnersList" class="loading">Loading...</div>
+        </div>
+        <div class="card">
+            <h3>📊 GLOBAL LEADERBOARD</h3>
+            <div id="leaderboardList" class="loading">Loading...</div>
+            <div id="yourRank" class="your-rank hidden"></div>
+        </div>
+    </div>
+
+    <!-- PLAY & EARN -->
+    <div class="hero-section">
+        <div class="play-earn">PLAY & EARN</div>
+        <div class="subtitle">Weekly Contest on Base</div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area">
+        <div class="game-card">
+            <div class="game-title">🐦 BASED-FLAPPY</div>
+            
+            <div class="prize-card">
+                <div class="prize-amount" id="prizePool">0.000000 ETH</div>
+                <div class="prize-explanation">
+                    💡 <strong>More players = Bigger prize pool!</strong><br>
+                    Every player pays <strong>0.00005 ETH</strong> to enter
+                    <div class="formula" id="formulaText">📊 Prize Pool = Players × 0.00005 ETH</div>
+                </div>
+                <div class="reward-split">
+                    <div class="split"><div class="split-icon">🥇</div><div class="split-percent">50%</div><div class="split-text">1st</div></div>
+                    <div class="split"><div class="split-icon">🥈</div><div class="split-percent">40%</div><div class="split-text">2nd</div></div>
+                    <div class="split"><div class="split-icon">⚡</div><div class="split-percent">10%</div><div class="split-text">Fee</div></div>
+                </div>
+            </div>
+
+            <div id="walletConnectUI">
+                <button class="connect-btn" id="connectBtn">🔌 Connect Wallet</button>
+            </div>
+            <div id="walletInfoUI" class="hidden">
+                <div class="wallet-info">
+                    <span>🔗</span>
+                    <span id="walletDisplay"></span>
+                    <button id="disconnectBtn" style="background: rgba(255,255,255,0.1); border: none; padding: 5px 12px; border-radius: 20px; color: white; cursor: pointer;">Exit</button>
+                </div>
+                <button class="entry-btn" id="entryBtn">💰 Pay 0.00005 ETH & Enter Contest</button>
+                <div id="entryStatus"></div>
+            </div>
+
+            <div id="gameSection" class="hidden">
+                <canvas id="gameCanvas" width="400" height="600"></canvas>
+                <div class="game-status" id="gameStatus">Tap or SPACE to jump! Avoid pipes!</div>
+                <div class="current-score" id="scoreDisplay">Score: 0</div>
+            </div>
+            <div id="gameLockedMsg" class="game-status" style="background: rgba(0,0,0,0.5);">🔒 Connect wallet & pay to start</div>
+        </div>
+    </div>
+
+    <div id="endMessage" class="end-message hidden">
+        🎉 Competition Ended! 🎉<br>✨ Reward will be transferred to top 2 scorers within 24 hours ✨
+    </div>
+</div>
+
+<script>
+    // ============ SUPABASE CONFIG ============
+    const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
+    
+    const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    const POOL_ADDRESS = "0x88ce80898A03d83a8519e2a43a96c0e8Fc0f8CA9";
+    const ENTRY_FEE = "0.00005";
+    
+    let userAddress = null;
+    let hasEntered = false;
+    let currentScore = 0;
+    let gameRunning = false;
+    let gameLoopId = null;
+    
+    // Game Variables
+    let bird = { x: 60, y: 300, velocity: 0, radius: 14 };
+    let pipes = [], frameCount = 0;
+    let gravity = 0.2, jumpPower = -4.8, pipeGap = 150, pipeWidth = 55, pipeInterval = 95;
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // ============ HELPER FUNCTIONS ============
+    function getWeekNumber() {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 1);
+        const days = Math.floor((now - start) / (24*60*60*1000));
+        return Math.ceil(days / 7);
+    }
+    
+    function getWeekEnd() {
+        const now = new Date();
+        const end = new Date(now);
+        end.setDate(now.getDate() + (7 - now.getDay()));
+        end.setHours(23,59,59,999);
+        return end;
+    }
+    
+    // ============ GLOBAL LEADERBOARD ============
+    async function loadGlobalLeaderboard() {
+        const weekNumber = getWeekNumber();
+        
+        const { data, error } = await supabase
+            .from('scores')
+            .select('wallet_address, username, score')
+            .eq('week_number', weekNumber)
+            .order('score', { ascending: false })
+            .limit(10);
+        
+        if (error) {
+            console.error("Leaderboard error:", error);
+            document.getElementById('leaderboardList').innerHTML = '<div class="loading">⚠️ Error loading leaderboard</div>';
+            return;
+        }
+        
+        const listDiv = document.getElementById('leaderboardList');
+        if (!data || data.length === 0) {
+            listDiv.innerHTML = '<div class="loading">✨ No players yet. Be the first!</div>';
+            return;
+        }
+        
+        listDiv.innerHTML = data.map((s, i) => {
+            let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+            let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+            let isCurrent = s.wallet_address === userAddress;
+            let displayName = s.username || s.wallet_address.slice(0,8);
+            return `<div class="leaderboard-item ${isCurrent ? 'current-user' : ''}">
+                        <span class="${rankClass}" style="width: 40px;">${rankIcon}</span>
+                        <span style="flex:1;">${displayName}</span>
+                        <span style="color:#3B82F6; font-weight:bold;">${s.score}</span>
+                    </div>`;
+        }).join('');
+        
+        // Show user's rank
+        if (userAddress) {
+            const { data: allScores } = await supabase
+                .from('scores')
+                .select('wallet_address, score')
+                .eq('week_number', weekNumber)
+                .order('score', { ascending: false });
+            
+            const idx = allScores?.findIndex(s => s.wallet_address === userAddress);
+            if (idx !== undefined && idx !== -1) {
+                document.getElementById('yourRank').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${allScores[idx].score}`;
+                document.getElementById('yourRank').classList.remove('hidden');
+            } else if (hasEntered) {
+                document.getElementById('yourRank').innerHTML = '📍 Play to get on leaderboard!';
+                document.getElementById('yourRank').classList.remove('hidden');
+            }
+        }
+        
+        await loadPrizePool();
+    }
+    
+    // ============ LOAD PRIZE POOL ============
+    async function loadPrizePool() {
+        const weekNumber = getWeekNumber();
+        const { data, error } = await supabase
+            .from('scores')
+            .select('wallet_address')
+            .eq('week_number', weekNumber);
+        
+        const playerCount = data?.length || 0;
+        const totalPool = playerCount * 0.00005;
+        document.getElementById('prizePool').innerHTML = `${totalPool.toFixed(6)} ETH`;
+        document.getElementById('totalPlayers').innerHTML = playerCount;
+        
+        const formulaEl = document.getElementById('formulaText');
+        if (formulaEl && playerCount > 0) {
+            formulaEl.innerHTML = `📊 Current: ${playerCount} Players × 0.00005 ETH = ${totalPool.toFixed(6)} ETH`;
+        }
+    }
+    
+    // ============ LOAD PREVIOUS WINNERS ============
+    async function loadPreviousWinners() {
+        const { data, error } = await supabase
+            .from('contests')
+            .select('*')
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false })
+            .limit(3);
+        
+        const winnersDiv = document.getElementById('winnersList');
+        if (error || !data || data.length === 0) {
+            winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>';
+            return;
+        }
+        
+        winnersDiv.innerHTML = data.map(w => `
+            <div class="winner-item">
+                <div>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(6)} ETH</div>
+                ${w.winner2_address ? `<div>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(6)} ETH</div>` : ''}
+                <div style="font-size: 10px; color: #6B6B84;">Week ${w.week_number}</div>
+            </div>
+        `).join('');
+    }
+    
+    // ============ SUBMIT SCORE ============
+    async function submitScoreToGlobal(score) {
+        const weekNumber = getWeekNumber();
+        const username = userAddress.slice(0,8);
+        
+        const { data: existing } = await supabase
+            .from('scores')
+            .select('score')
+            .eq('wallet_address', userAddress)
+            .eq('week_number', weekNumber)
+            .single();
+        
+        if (existing && score <= existing.score) {
+            console.log("Score not higher than existing");
+            return;
+        }
+        
+        if (existing) {
+            await supabase
+                .from('scores')
+                .update({ score: score, username: username, updated_at: new Date() })
+                .eq('wallet_address', userAddress)
+                .eq('week_number', weekNumber);
+        } else {
+            await supabase
+                .from('scores')
+                .insert({ wallet_address: userAddress, username: username, score: score, week_number: weekNumber });
+        }
+        
+        await loadGlobalLeaderboard();
+    }
+    
+    // ============ MARK ENTRY ============
+    async function markEntry(txHash) {
+        const weekNumber = getWeekNumber();
+        
+        const { data: contest } = await supabase
+            .from('contests')
+            .select('id')
+            .eq('week_number', weekNumber)
+            .single();
+        
+        if (contest) {
+            await supabase
+                .from('entries')
+                .insert({ wallet_address: userAddress, contest_id: contest.id, paid_amount: 0.00005, paid_tx_hash: txHash });
+            
+            const { data: entries } = await supabase
+                .from('entries')
+                .select('*')
+                .eq('contest_id', contest.id);
+            
+            await supabase
+                .from('contests')
+                .update({ total_players: entries.length, total_pool: entries.length * 0.00005 })
+                .eq('id', contest.id);
+        }
+        
+        hasEntered = true;
+        localStorage.setItem(`entered_${userAddress}`, 'true');
+        document.getElementById('entryBtn').disabled = true;
+        document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
+        document.getElementById('gameSection').classList.remove('hidden');
+        document.getElementById('gameLockedMsg').classList.add('hidden');
+        startGame();
+        await loadPrizePool();
+    }
+    
+    // ============ WALLET CONNECTION ============
+    async function connectWallet() {
+        if (typeof window.ethereum === 'undefined') {
+            alert('❌ No wallet found!\n\nPlease install:\n- MetaMask\n- Coinbase Wallet');
+            window.open('https://metamask.io/download/', '_blank');
+            return;
+        }
+        
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            userAddress = accounts[0];
+            
+            document.getElementById('walletDisplay').innerHTML = `${userAddress.slice(0,8)}...${userAddress.slice(-6)}`;
+            document.getElementById('walletConnectUI').classList.add('hidden');
+            document.getElementById('walletInfoUI').classList.remove('hidden');
+            
+            // Check if already entered
+            const weekNumber = getWeekNumber();
+            const { data: existingEntry } = await supabase
+                .from('entries')
+                .select('*')
+                .eq('wallet_address', userAddress);
+            
+            if (existingEntry && existingEntry.length > 0) {
+                hasEntered = true;
+                document.getElementById('entryBtn').disabled = true;
+                document.getElementById('entryBtn').innerHTML = '✅ Already Entered!';
+                document.getElementById('gameSection').classList.remove('hidden');
+                document.getElementById('gameLockedMsg').classList.add('hidden');
+                startGame();
+            }
+            
+            await loadGlobalLeaderboard();
+            
+        } catch(e) {
+            alert("Failed to connect: " + e.message);
+        }
+    }
+    
+    function disconnectWallet() {
+        userAddress = null;
+        hasEntered = false;
+        document.getElementById('walletConnectUI').classList.remove('hidden');
+        document.getElementById('walletInfoUI').classList.add('hidden');
+        document.getElementById('gameSection').classList.add('hidden');
+        document.getElementById('gameLockedMsg').classList.remove('hidden');
+        loadGlobalLeaderboard();
+    }
+    
+    async function enterContest() {
+        if (!userAddress) { alert("Connect wallet first!"); return; }
+        if (hasEntered) { alert("Already entered this week!"); return; }
+        
+        document.getElementById('entryBtn').disabled = true;
+        document.getElementById('entryBtn').innerHTML = '⏳ Processing...';
+        
+        try {
+            // Simulate transaction (in production, use actual sendTransaction)
+            const mockTxHash = "0x" + Math.random().toString(36).substring(2, 15);
+            
+            setTimeout(async () => {
+                await markEntry(mockTxHash);
+                document.getElementById('entryStatus').innerHTML = '<div style="color:#3B82F6; margin-top:8px;">✅ Entry confirmed!</div>';
+            }, 1500);
+            
+        } catch(e) {
+            document.getElementById('entryBtn').disabled = false;
+            document.getElementById('entryBtn').innerHTML = '💰 Pay 0.00005 ETH & Enter Contest';
+            document.getElementById('entryStatus').innerHTML = '<div style="color:#ff4444; margin-top:8px;">❌ Failed</div>';
+        }
+    }
+    
+    // ============ FLAPPY BIRD GAME ============
+    function initGame() { if(!hasEntered) return; bird = { x: 60, y: canvas.height/2, velocity: 0, radius: 14 }; pipes = []; frameCount = 0; currentScore = 0; gameRunning = true; document.getElementById('scoreDisplay').innerHTML = 'Score: 0'; }
+    function jump() { if(gameRunning) bird.velocity = jumpPower; }
+    function createPipe() { let minH=60, maxH=canvas.height-150-minH, topH=Math.random()*(maxH-minH)+minH; pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH+150, passed: false }); }
+    function updateGame() {
+        if(!gameRunning || !hasEntered) return;
+        bird.velocity += gravity; bird.y += bird.velocity;
+        if(bird.y-14<0 || bird.y+14>canvas.height) { gameOver(); return; }
+        frameCount++; if(frameCount>95) { createPipe(); frameCount=0; }
+        for(let i=0; i<pipes.length; i++) {
+            pipes[i].x -= 2.8;
+            if(!pipes[i].passed && pipes[i].x+55<bird.x) { pipes[i].passed=true; currentScore++; document.getElementById('scoreDisplay').innerHTML = `Score: ${currentScore}`; }
+            if(bird.x+14>pipes[i].x && bird.x-14<pipes[i].x+55 && (bird.y-14<pipes[i].topHeight || bird.y+14>pipes[i].bottomY)) { gameOver(); return; }
+            if(pipes[i].x+55<0) { pipes.splice(i,1); i--; }
+        }
+    }
+    function draw() {
+        ctx.fillStyle='#87CEEB'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='#DEB887'; ctx.fillRect(0,canvas.height-50,canvas.width,50);
+        for(let p of pipes) {
+            ctx.fillStyle='#228B22'; ctx.fillRect(p.x,0,55,p.topHeight);
+            ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.topHeight-30,65,30);
+            ctx.fillStyle='#228B22'; ctx.fillRect(p.x,p.bottomY,55,canvas.height-p.bottomY);
+            ctx.fillStyle='#006400'; ctx.fillRect(p.x-5,p.bottomY,65,30);
+        }
+        ctx.fillStyle='#3B82F6'; ctx.beginPath(); ctx.arc(bird.x,bird.y,14,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#1E40AF'; ctx.beginPath(); ctx.arc(bird.x-2,bird.y-2,4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,2,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='black'; ctx.beginPath(); ctx.arc(bird.x-4,bird.y-4,1,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='white'; ctx.font='bold 32px Arial'; ctx.fillText(currentScore,canvas.width/2-15,60);
+    }
+    function gameOver() { gameRunning=false; if(hasEntered && currentScore>0) submitScoreToGlobal(currentScore); document.getElementById('gameStatus').innerHTML = `💀 Game Over! Score: ${currentScore}. Tap to restart!`; }
+    function resetGame() { if(!hasEntered) return; initGame(); document.getElementById('gameStatus').innerHTML = 'Tap or SPACE to jump! Avoid pipes!'; }
+    function startGame() { if(!hasEntered) return; initGame(); if(gameLoopId) cancelAnimationFrame(gameLoopId); function loop() { updateGame(); draw(); gameLoopId = requestAnimationFrame(loop); } loop(); }
+    
+    // ============ TIMER ============
+    function startTimer() {
+        function update() {
+            let diff = getWeekEnd() - new Date();
+            if(diff <= 0) { document.getElementById('timeLeft').innerHTML = 'Ended'; document.getElementById('endMessage').classList.remove('hidden'); return; }
+            let d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
+            document.getElementById('timeLeft').innerHTML = `${d}d ${h}h ${m}m`;
+            document.getElementById('weekBadge').innerHTML = `Week ${getWeekNumber()}`;
+        }
+        update(); setInterval(update, 60000);
+    }
+    
+    // ============ EVENT LISTENERS ============
+    document.getElementById('connectBtn').addEventListener('click', connectWallet);
+    document.getElementById('disconnectBtn').addEventListener('click', disconnectWallet);
+    document.getElementById('entryBtn').addEventListener('click', enterContest);
+    document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); } });
+    canvas.addEventListener('click', () => { if(!gameRunning && hasEntered) resetGame(); jump(); });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); if(!gameRunning && hasEntered) resetGame(); jump(); });
+    
+    // ============ INITIAL LOAD ============
+    loadGlobalLeaderboard();
+    loadPreviousWinners();
+    startTimer();
+</script>
+</body>
+</html>
