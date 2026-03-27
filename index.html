@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* Navigation Bar */
         .navbar {
             position: fixed;
             top: 0;
@@ -77,14 +76,12 @@
             background: rgba(59,130,246,0.3);
         }
 
-        /* Main Content */
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
             padding: 100px 24px 40px;
         }
 
-        /* Game Container */
         .game-container {
             display: flex;
             flex-direction: column;
@@ -104,10 +101,6 @@
             cursor: pointer;
             display: block;
             margin: 0 auto;
-            transition: transform 0.2s;
-        }
-        canvas:hover {
-            transform: scale(1.02);
         }
         .game-controls {
             display: flex;
@@ -157,12 +150,11 @@
             margin-bottom: 16px;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            margin-top: 48px;
+            margin-top: 0;
         }
         .stat-card {
             background: rgba(15, 20, 35, 0.6);
@@ -181,7 +173,7 @@
             color: #3B82F6;
         }
         .leaderboard-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         .leaderboard-item {
@@ -192,10 +184,11 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .leaderboard-rank {
-            width: 40px;
+            width: 45px;
             font-weight: 700;
+            font-size: 16px;
         }
-        .rank-1 { color: #FFD700; }
+        .rank-1 { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
         .rank-2 { color: #C0C0C0; }
         .rank-3 { color: #CD7F32; }
         .leaderboard-player {
@@ -205,37 +198,38 @@
             gap: 12px;
         }
         .player-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, #3B82F6, #60A5FA);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
         }
         .leaderboard-score {
             font-weight: 700;
             color: #3B82F6;
+            font-size: 18px;
         }
         .your-rank-card {
             margin-top: 16px;
             padding: 12px;
-            background: rgba(59,130,246,0.15);
+            background: rgba(59,130,246,0.2);
             border-radius: 16px;
             text-align: center;
             font-size: 13px;
+            border: 1px solid rgba(59,130,246,0.3);
         }
         .winner-item {
             padding: 12px;
-            background: rgba(255,215,0,0.05);
+            background: rgba(255,215,0,0.08);
             border-radius: 16px;
             margin-bottom: 10px;
-            border: 1px solid rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.15);
         }
 
-        /* Game Over Modal */
         .gameover-modal {
             position: fixed;
             top: 0;
@@ -351,7 +345,7 @@
         <div id="leaderboardTab" class="hidden">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>🏆 TOP SCORERS</h3>
+                    <h3>🏆 TOP SCORERS (This Week)</h3>
                     <div id="leaderboardList" class="leaderboard-list">Loading...</div>
                     <div id="yourRankDisplay" class="your-rank-card hidden"></div>
                 </div>
@@ -428,7 +422,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // City Buildings Configuration
+        // City Buildings
         const buildings = [
             { x: 0, width: 60, height: 180, color: '#2C3E50' },
             { x: 80, width: 45, height: 240, color: '#34495E' },
@@ -441,7 +435,6 @@
             { x: 575, width: 62, height: 240, color: '#2C3E50' }
         ];
         
-        // Clouds
         let clouds = [
             { x: 50, y: 60, size: 40 },
             { x: 200, y: 40, size: 55 },
@@ -449,8 +442,214 @@
             { x: 500, y: 30, size: 60 }
         ];
         
+        function getWeekNumber() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const days = Math.floor((now - start) / (24*60*60*1000));
+            return Math.ceil(days / 7);
+        }
+        
+        // ============ LEADERBOARD FUNCTIONS ============
+        async function loadLeaderboard() {
+            const week = getWeekNumber();
+            console.log("Loading leaderboard for week:", week);
+            
+            const { data, error } = await supabaseClient
+                .from('scores')
+                .select('wallet_address, username, score')
+                .eq('week_number', week)
+                .order('score', { ascending: false })
+                .limit(20);
+            
+            const listDiv = document.getElementById('leaderboardList');
+            if (error) {
+                console.error("Leaderboard error:", error);
+                listDiv.innerHTML = '<div class="loading">⚠️ Error loading leaderboard</div>';
+                return;
+            }
+            
+            if (!data || data.length === 0) {
+                listDiv.innerHTML = '<div class="loading">✨ No players yet. Be the first!</div>';
+                return;
+            }
+            
+            listDiv.innerHTML = data.map((s, i) => {
+                let rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                let name = s.username || s.wallet_address.slice(0,8);
+                let isCurrent = s.wallet_address === userAddress;
+                return `<div class="leaderboard-item" style="${isCurrent ? 'background: rgba(59,130,246,0.1); border-radius: 12px;' : ''}">
+                    <div class="leaderboard-rank ${rankClass}">${rank}</div>
+                    <div class="leaderboard-player">
+                        <div class="player-avatar">${name.charAt(0).toUpperCase()}</div>
+                        <span>${name}</span>
+                    </div>
+                    <div class="leaderboard-score">${s.score}</div>
+                </div>`;
+            }).join('');
+            
+            // Update prize pool display
+            const totalPool = (data.length) * 0.00005;
+            document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
+            
+            // Show user's rank
+            if (userAddress) {
+                const { data: all } = await supabaseClient
+                    .from('scores')
+                    .select('wallet_address, score')
+                    .eq('week_number', week)
+                    .order('score', { ascending: false });
+                const idx = all?.findIndex(s => s.wallet_address === userAddress);
+                if (idx !== undefined && idx !== -1) {
+                    document.getElementById('yourRankDisplay').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${all[idx].score}`;
+                    document.getElementById('yourRankDisplay').classList.remove('hidden');
+                } else if (hasEntered) {
+                    document.getElementById('yourRankDisplay').innerHTML = `📍 Play to get on leaderboard!`;
+                    document.getElementById('yourRankDisplay').classList.remove('hidden');
+                }
+            }
+        }
+        
+        async function loadWinners() {
+            const { data, error } = await supabaseClient
+                .from('contests')
+                .select('*')
+                .eq('status', 'completed')
+                .order('created_at', { ascending: false })
+                .limit(5);
+            
+            const winnersDiv = document.getElementById('winnersList');
+            if (error || !data || data.length === 0) {
+                winnersDiv.innerHTML = '<div class="loading">🏆 No previous winners yet</div>';
+                return;
+            }
+            
+            winnersDiv.innerHTML = data.map(w => `
+                <div class="winner-item">
+                    <div style="font-weight: bold; margin-bottom: 5px;">🏆 Week ${w.week_number}</div>
+                    <div>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>
+                    ${w.winner2_address ? `<div>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(5)} ETH</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        async function submitScore(score) {
+            if (!userAddress || !hasEntered) return;
+            const week = getWeekNumber();
+            const username = userAddress.slice(0,8);
+            
+            const { data: existing } = await supabaseClient
+                .from('scores')
+                .select('score')
+                .eq('wallet_address', userAddress)
+                .eq('week_number', week)
+                .single();
+            
+            if (existing && score <= existing.score) return;
+            
+            if (existing) {
+                await supabaseClient
+                    .from('scores')
+                    .update({ score, username, updated_at: new Date() })
+                    .eq('wallet_address', userAddress)
+                    .eq('week_number', week);
+            } else {
+                await supabaseClient
+                    .from('scores')
+                    .insert({ wallet_address: userAddress, username, score, week_number: week });
+            }
+            loadLeaderboard();
+        }
+        
+        async function markEntry(txHash) {
+            const week = getWeekNumber();
+            const { data: contest } = await supabaseClient
+                .from('contests')
+                .select('id')
+                .eq('week_number', week)
+                .single();
+            
+            if (contest) {
+                await supabaseClient
+                    .from('entries')
+                    .insert({ wallet_address: userAddress, contest_id: contest.id, paid_amount: 0.00005, paid_tx_hash: txHash });
+            }
+            hasEntered = true;
+            localStorage.setItem(`entered_${userAddress}`, 'true');
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '✅ ENTERED! START PLAYING';
+            loadLeaderboard();
+        }
+        
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Install MetaMask or Coinbase Wallet!');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                userAddress = accounts[0];
+                signer = provider.getSigner();
+                
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                if (chainId !== '0x2105') {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x2105' }]
+                        });
+                    } catch(e) {}
+                }
+                
+                document.getElementById('walletBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+                document.getElementById('walletStatus').innerHTML = '✅ Wallet connected!';
+                
+                const { data: existing } = await supabaseClient
+                    .from('entries')
+                    .select('*')
+                    .eq('wallet_address', userAddress);
+                
+                if (existing && existing.length > 0) {
+                    hasEntered = true;
+                    document.getElementById('entryBtn').disabled = true;
+                    document.getElementById('entryBtn').innerHTML = '✅ ENTERED! START PLAYING';
+                }
+                
+                loadLeaderboard();
+                loadWinners();
+            } catch(e) {
+                document.getElementById('walletStatus').innerHTML = '❌ Connection failed';
+            }
+        }
+        
+        async function enterContest() {
+            if (!userAddress) { alert("Connect wallet first!"); return; }
+            if (hasEntered) { alert("Already entered!"); return; }
+            if (!signer) return;
+            
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '⏳ CONFIRM IN WALLET...';
+            document.getElementById('walletStatus').innerHTML = '📝 Please confirm transaction in your wallet';
+            
+            try {
+                const tx = { to: POOL_ADDRESS, value: ethers.utils.parseEther(ENTRY_FEE), gasLimit: 100000 };
+                const transaction = await signer.sendTransaction(tx);
+                document.getElementById('walletStatus').innerHTML = '⏳ Transaction sent! Waiting...';
+                await transaction.wait();
+                await markEntry(transaction.hash);
+                document.getElementById('walletStatus').innerHTML = '✅ Entry confirmed! Start playing!';
+                document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
+            } catch(e) {
+                document.getElementById('entryBtn').disabled = false;
+                document.getElementById('entryBtn').innerHTML = '💰 PAY & ENTER (0.00005 ETH)';
+                document.getElementById('walletStatus').innerHTML = '❌ Transaction failed: ' + e.message.slice(0,80);
+            }
+        }
+        
+        // Game Functions
         function drawCityBackground() {
-            // Sky gradient
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, '#0F2027');
             gradient.addColorStop(0.5, '#203A43');
@@ -458,33 +657,20 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw clouds with parallax
             clouds.forEach(cloud => {
-                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
                 ctx.beginPath();
                 ctx.arc(cloud.x - 20 + bgOffset * 0.3, cloud.y, cloud.size * 0.6, 0, Math.PI * 2);
                 ctx.arc(cloud.x + bgOffset * 0.3, cloud.y, cloud.size, 0, Math.PI * 2);
                 ctx.arc(cloud.x + 20 + bgOffset * 0.3, cloud.y, cloud.size * 0.7, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.beginPath();
-                ctx.arc(cloud.x - 10 + bgOffset * 0.3, cloud.y - 5, cloud.size * 0.4, 0, Math.PI * 2);
-                ctx.arc(cloud.x + 10 + bgOffset * 0.3, cloud.y - 5, cloud.size * 0.4, 0, Math.PI * 2);
-                ctx.fill();
             });
             
-            // Draw buildings with windows
             buildings.forEach(building => {
                 const x = building.x - bgOffset * 0.5;
                 if (x + building.width > 0 && x < canvas.width) {
-                    // Building shadow
                     ctx.fillStyle = building.color;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
                     ctx.fillRect(x, canvas.height - building.height - 50, building.width, building.height);
-                    ctx.shadowBlur = 0;
-                    
-                    // Windows
                     ctx.fillStyle = '#FFD966';
                     for (let i = 0; i < 4; i++) {
                         for (let j = 0; j < 3; j++) {
@@ -494,7 +680,6 @@
                 }
             });
             
-            // Ground with grass
             ctx.fillStyle = '#2D5A2C';
             ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
             ctx.fillStyle = '#3E7A3A';
@@ -510,23 +695,16 @@
         function drawDetailedBird() {
             const wingFlap = Math.sin(bird.wingAngle) * 0.5 + 0.5;
             
-            // Body shadow
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = 'rgba(0,0,0,0.3)';
-            
-            // Main body
             ctx.fillStyle = '#FFB347';
             ctx.beginPath();
             ctx.ellipse(bird.x, bird.y, bird.radius, bird.radius * 1.2, 0, 0, Math.PI * 2);
             ctx.fill();
             
-            // Belly
             ctx.fillStyle = '#FFD966';
             ctx.beginPath();
             ctx.ellipse(bird.x, bird.y + 2, bird.radius - 2, bird.radius * 0.8, 0, 0, Math.PI * 2);
             ctx.fill();
             
-            // Wing
             ctx.fillStyle = '#E67E22';
             ctx.beginPath();
             ctx.moveTo(bird.x - 5, bird.y);
@@ -534,14 +712,6 @@
             ctx.quadraticCurveTo(bird.x - 8, bird.y + 5, bird.x - 5, bird.y);
             ctx.fill();
             
-            // Wing details
-            ctx.fillStyle = '#D35400';
-            ctx.beginPath();
-            ctx.moveTo(bird.x - 8, bird.y);
-            ctx.quadraticCurveTo(bird.x - 13 - wingFlap * 5, bird.y - 2, bird.x - 10, bird.y + 2);
-            ctx.fill();
-            
-            // Eye
             ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(bird.x + 8, bird.y - 4, 4, 0, Math.PI * 2);
@@ -550,59 +720,33 @@
             ctx.beginPath();
             ctx.arc(bird.x + 9, bird.y - 5, 2, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(bird.x + 10, bird.y - 6, 1, 0, Math.PI * 2);
-            ctx.fill();
             
-            // Beak
             ctx.fillStyle = '#E67E22';
             ctx.beginPath();
             ctx.moveTo(bird.x + 12, bird.y - 2);
             ctx.lineTo(bird.x + 22, bird.y);
             ctx.lineTo(bird.x + 12, bird.y + 2);
             ctx.fill();
-            
-            // Crest
-            ctx.fillStyle = '#E67E22';
-            ctx.beginPath();
-            ctx.moveTo(bird.x - 2, bird.y - 12);
-            ctx.lineTo(bird.x - 8, bird.y - 18);
-            ctx.lineTo(bird.x + 2, bird.y - 14);
-            ctx.fill();
-            
-            ctx.shadowBlur = 0;
         }
         
         function drawPipes() {
             for (let p of pipes) {
-                // Pipe shadow
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                
-                // Top pipe with gradient
                 const topGrad = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
                 topGrad.addColorStop(0, '#2E7D32');
                 topGrad.addColorStop(1, '#1B5E20');
                 ctx.fillStyle = topGrad;
                 ctx.fillRect(p.x, 0, pipeWidth, p.topHeight);
-                
-                // Pipe rim
                 ctx.fillStyle = '#0D4700';
                 ctx.fillRect(p.x - 5, p.topHeight - 30, pipeWidth + 10, 30);
                 
-                // Bottom pipe
                 const bottomGrad = ctx.createLinearGradient(p.x, p.bottomY, p.x + pipeWidth, p.bottomY + 50);
                 bottomGrad.addColorStop(0, '#2E7D32');
                 bottomGrad.addColorStop(1, '#1B5E20');
                 ctx.fillStyle = bottomGrad;
                 ctx.fillRect(p.x, p.bottomY, pipeWidth, canvas.height - p.bottomY);
-                
-                // Bottom pipe rim
                 ctx.fillStyle = '#0D4700';
                 ctx.fillRect(p.x - 5, p.bottomY, pipeWidth + 10, 30);
             }
-            ctx.shadowBlur = 0;
         }
         
         function initGame() {
@@ -626,7 +770,6 @@
         function updateGame() {
             if (!gameRunning) return;
             
-            // Update bird wing animation
             bird.wingAngle += 0.15 * bird.wingDirection;
             if (bird.wingAngle > 1) bird.wingDirection = -1;
             if (bird.wingAngle < -0.5) bird.wingDirection = 1;
@@ -659,71 +802,7 @@
             drawCityBackground();
             drawPipes();
             drawDetailedBird();
-            
-            // Score with shadow
-            ctx.shadowBlur = 0;
             ctx.font = 'bold 48px Inter';
             ctx.fillStyle = 'white';
             ctx.shadowBlur = 4;
-            ctx.shadowColor = 'black';
-            ctx.fillText(currentScore, canvas.width/2 - 20, 80);
-            ctx.shadowBlur = 0;
-        }
-        
-        function gameOver() {
-            gameRunning = false;
-            if (hasEntered && currentScore > 0) {
-                submitScore(currentScore);
-            }
-            document.getElementById('finalScore').innerText = currentScore;
-            const best = localStorage.getItem('bestScore') || 0;
-            if (currentScore > best) localStorage.setItem('bestScore', currentScore);
-            document.getElementById('bestScore').innerText = Math.max(currentScore, best);
-            document.getElementById('gameoverModal').classList.remove('hidden');
-        }
-        
-        function startGame() {
-            if (!hasEntered) {
-                document.getElementById('walletStatus').innerHTML = '⚠️ Pay entry fee first!';
-                return;
-            }
-            initGame();
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            function loop() { updateGame(); draw(); gameLoopId = requestAnimationFrame(loop); }
-            loop();
-        }
-        
-        // Rest of the functions (Supabase, wallet, leaderboard) remain same as previous version...
-        // [Keeping existing Supabase functions for brevity]
-        
-        // Add event listeners
-        document.getElementById('walletBtn').addEventListener('click', connectWallet);
-        document.getElementById('entryBtn').addEventListener('click', enterContest);
-        document.getElementById('playBtn').addEventListener('click', startGame);
-        document.getElementById('restartBtn').addEventListener('click', () => {
-            document.getElementById('gameoverModal').classList.add('hidden');
-            startGame();
-        });
-        document.getElementById('closeModalBtn').addEventListener('click', () => {
-            document.getElementById('gameoverModal').classList.add('hidden');
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (!gameRunning && hasEntered) startGame();
-                jump();
-            }
-        });
-        
-        canvas.addEventListener('click', () => {
-            if (!gameRunning && hasEntered) startGame();
-            jump();
-        });
-        
-        // Initialize
-        function drawInitial() { drawCityBackground(); drawPipes(); drawDetailedBird(); }
-        drawInitial();
-    </script>
-</body>
-</html>
+            ctx.shadowColor = 'black
