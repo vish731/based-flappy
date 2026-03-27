@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BASED-FLAPPY | Premium Edition</title>
+    <title>BASED-FLAPPY | Play & Earn on Base</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- ✅ SIRF YEH LINE ADD KI HAI -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -188,7 +190,7 @@
             font-weight: 700;
             font-size: 16px;
         }
-        .rank-1 { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
+        .rank-1 { color: #FFD700; }
         .rank-2 { color: #C0C0C0; }
         .rank-3 { color: #CD7F32; }
         .leaderboard-player {
@@ -254,14 +256,8 @@
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .gameover-title {
             font-size: 48px;
@@ -326,19 +322,16 @@
 
     <div class="main-content">
         <div id="gameTab" class="game-container">
-            <div class="entry-fee-badge" id="entryFeeStatus">
+            <div class="entry-fee-badge">
                 💰 Entry Fee: 0.00005 ETH | Prize Pool: <span id="prizePoolDisplay">0</span> ETH
             </div>
-            
             <div class="game-wrapper">
                 <canvas id="gameCanvas" width="400" height="600"></canvas>
             </div>
-            
             <div class="game-controls">
                 <button class="btn-primary" id="playBtn">▶ START GAME</button>
                 <button class="btn-secondary" id="entryBtn">💰 PAY & ENTER (0.00005 ETH)</button>
             </div>
-            
             <div id="walletStatus" style="margin-top: 16px; font-size: 12px; color: #8B8B9E;"></div>
         </div>
 
@@ -346,12 +339,12 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>🏆 TOP SCORERS (This Week)</h3>
-                    <div id="leaderboardList" class="leaderboard-list">Loading...</div>
+                    <div id="leaderboardList" class="leaderboard-list">Loading leaderboard...</div>
                     <div id="yourRankDisplay" class="your-rank-card hidden"></div>
                 </div>
                 <div class="stat-card">
                     <h3>🏆 PREVIOUS WINNERS</h3>
-                    <div id="winnersList">Loading...</div>
+                    <div id="winnersList">Loading winners...</div>
                 </div>
             </div>
         </div>
@@ -359,13 +352,38 @@
         <div id="aboutTab" class="hidden">
             <div class="stat-card" style="max-width: 600px; margin: 0 auto;">
                 <h3>🎮 ABOUT BASED-FLAPPY</h3>
-                <p style="line-height: 1.6; color: #ccc;">Premium Flappy Bird experience on Base Chain. Pay entry fee, compete globally, win ETH prizes!</p>
-                <br>
+                <p style="line-height: 1.6; color: #ccc; margin-bottom: 20px;">
+                    BASED-FLAPPY is a weekly Flappy Bird contest on Base Chain. 
+                    Pay a small entry fee, play the game, compete globally, and win ETH prizes!
+                </p>
+                
                 <h4>📋 How to Play:</h4>
-                <p style="color: #ccc;">1. Connect your Base wallet<br>2. Pay 0.00005 ETH entry fee<br>3. Tap/Click or press SPACE to fly<br>4. Avoid pipes and get high score!<br>5. Top 2 winners get 50% & 40% of prize pool</p>
-                <br>
+                <p style="color: #ccc; margin-bottom: 15px;">
+                    1. Connect your Base wallet (MetaMask/Coinbase)<br>
+                    2. Pay 0.00005 ETH entry fee<br>
+                    3. Tap/Click or press SPACE to make the bird fly<br>
+                    4. Avoid the green pipes<br>
+                    5. The higher your score, the better your rank!<br>
+                    6. Top 2 winners at the end of the week get ETH rewards
+                </p>
+                
                 <h4>💰 Prize Distribution:</h4>
-                <p style="color: #ccc;">🥇 1st Place: 50% of total pool<br>🥈 2nd Place: 40% of total pool<br>⚡ Platform Fee: 10%</p>
+                <p style="color: #ccc; margin-bottom: 15px;">
+                    🥇 1st Place: 50% of total prize pool<br>
+                    🥈 2nd Place: 40% of total prize pool<br>
+                    ⚡ Platform Fee: 10% (for development & maintenance)
+                </p>
+                
+                <h4>📊 Prize Pool Example:</h4>
+                <p style="color: #ccc;">
+                    100 players = 0.005 ETH pool<br>
+                    Winner gets 0.0025 ETH | Runner-up gets 0.002 ETH
+                </p>
+                
+                <h4 style="margin-top: 20px;">🔗 Pool Contract Address:</h4>
+                <p style="color: #3B82F6; font-family: monospace; word-break: break-all;">
+                    0x78a4f29210F74b7062B03bE17e106e7A8d219d1A
+                </p>
             </div>
         </div>
     </div>
@@ -392,12 +410,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
-        // ============ SUPABASE CONFIG ============
+        // ============ CONFIGURATION ============
         const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const POOL_ADDRESS = "0x88ce80898A03d83a8519e2a43a96c0e8Fc0f8CA9";
+        
+        // ✅ SIRF YEH ADDRESS CHANGE KI HAI
+        const POOL_ADDRESS = "0x78a4f29210F74b7062B03bE17e106e7A8d219d1A";
         const ENTRY_FEE = "0.00005";
         
         let userAddress = null;
@@ -422,7 +442,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // City Buildings
+        // Buildings
         const buildings = [
             { x: 0, width: 60, height: 180, color: '#2C3E50' },
             { x: 80, width: 45, height: 240, color: '#34495E' },
@@ -449,10 +469,8 @@
             return Math.ceil(days / 7);
         }
         
-        // ============ LEADERBOARD FUNCTIONS ============
         async function loadLeaderboard() {
             const week = getWeekNumber();
-            console.log("Loading leaderboard for week:", week);
             
             const { data, error } = await supabaseClient
                 .from('scores')
@@ -463,7 +481,6 @@
             
             const listDiv = document.getElementById('leaderboardList');
             if (error) {
-                console.error("Leaderboard error:", error);
                 listDiv.innerHTML = '<div class="loading">⚠️ Error loading leaderboard</div>';
                 return;
             }
@@ -488,11 +505,9 @@
                 </div>`;
             }).join('');
             
-            // Update prize pool display
             const totalPool = (data.length) * 0.00005;
             document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
             
-            // Show user's rank
             if (userAddress) {
                 const { data: all } = await supabaseClient
                     .from('scores')
@@ -631,12 +646,16 @@
             
             document.getElementById('entryBtn').disabled = true;
             document.getElementById('entryBtn').innerHTML = '⏳ CONFIRM IN WALLET...';
-            document.getElementById('walletStatus').innerHTML = '📝 Please confirm transaction in your wallet';
+            document.getElementById('walletStatus').innerHTML = '📝 Sending 0.00005 ETH to pool address...';
             
             try {
-                const tx = { to: POOL_ADDRESS, value: ethers.utils.parseEther(ENTRY_FEE), gasLimit: 100000 };
+                const tx = { 
+                    to: POOL_ADDRESS, 
+                    value: ethers.utils.parseEther(ENTRY_FEE), 
+                    gasLimit: 100000 
+                };
                 const transaction = await signer.sendTransaction(tx);
-                document.getElementById('walletStatus').innerHTML = '⏳ Transaction sent! Waiting...';
+                document.getElementById('walletStatus').innerHTML = '⏳ Transaction sent! Waiting for confirmation...';
                 await transaction.wait();
                 await markEntry(transaction.hash);
                 document.getElementById('walletStatus').innerHTML = '✅ Entry confirmed! Start playing!';
@@ -694,24 +713,20 @@
         
         function drawDetailedBird() {
             const wingFlap = Math.sin(bird.wingAngle) * 0.5 + 0.5;
-            
             ctx.fillStyle = '#FFB347';
             ctx.beginPath();
             ctx.ellipse(bird.x, bird.y, bird.radius, bird.radius * 1.2, 0, 0, Math.PI * 2);
             ctx.fill();
-            
             ctx.fillStyle = '#FFD966';
             ctx.beginPath();
             ctx.ellipse(bird.x, bird.y + 2, bird.radius - 2, bird.radius * 0.8, 0, 0, Math.PI * 2);
             ctx.fill();
-            
             ctx.fillStyle = '#E67E22';
             ctx.beginPath();
             ctx.moveTo(bird.x - 5, bird.y);
             ctx.quadraticCurveTo(bird.x - 15 - wingFlap * 8, bird.y - 5, bird.x - 12, bird.y + 3);
             ctx.quadraticCurveTo(bird.x - 8, bird.y + 5, bird.x - 5, bird.y);
             ctx.fill();
-            
             ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(bird.x + 8, bird.y - 4, 4, 0, Math.PI * 2);
@@ -720,7 +735,6 @@
             ctx.beginPath();
             ctx.arc(bird.x + 9, bird.y - 5, 2, 0, Math.PI * 2);
             ctx.fill();
-            
             ctx.fillStyle = '#E67E22';
             ctx.beginPath();
             ctx.moveTo(bird.x + 12, bird.y - 2);
@@ -781,28 +795,4 @@
             bgOffset = (bgOffset + 1) % 800;
             
             frameCount++;
-            if (frameCount > pipeInterval) { createPipe(); frameCount = 0; }
-            
-            for (let i = 0; i < pipes.length; i++) {
-                pipes[i].x -= 2.5;
-                if (!pipes[i].passed && pipes[i].x + pipeWidth < bird.x) {
-                    pipes[i].passed = true;
-                    currentScore++;
-                }
-                if (bird.x + bird.radius > pipes[i].x && bird.x - bird.radius < pipes[i].x + pipeWidth &&
-                    (bird.y - bird.radius < pipes[i].topHeight || bird.y + bird.radius > pipes[i].bottomY)) {
-                    gameOver();
-                    return;
-                }
-                if (pipes[i].x + pipeWidth < 0) { pipes.splice(i,1); i--; }
-            }
-        }
-        
-        function draw() {
-            drawCityBackground();
-            drawPipes();
-            drawDetailedBird();
-            ctx.font = 'bold 48px Inter';
-            ctx.fillStyle = 'white';
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = 'black
+            if (frameCount > pipeInterval) { createPipe(); frameCount
