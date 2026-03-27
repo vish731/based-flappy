@@ -205,6 +205,7 @@
             width: 90%;
             border: 1px solid rgba(59,130,246,0.4);
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            pointer-events: auto;
         }
         .popup-header {
             text-align: center;
@@ -448,55 +449,49 @@
             const closePopupBtn = document.getElementById('closePopupBtn');
             const reminderBtn = document.getElementById('reminderBtn');
             
-            // Function to close popup
-            window.closeInfoPopup = function() {
-                if (popup) {
-                    popup.style.display = 'none';
-                    localStorage.setItem('popupShown', 'true');
-                }
-            };
+            // Hide popup initially
+            popup.style.display = 'flex';
             
-            // Function to show popup
-            window.showInfoPopup = function() {
-                if (popup) {
-                    popup.style.display = 'flex';
-                }
-            };
-            
-            // Check if popup has been shown before
-            if (!localStorage.getItem('popupShown')) {
-                // Show popup after 0.5 seconds
-                setTimeout(() => {
-                    if (popup) popup.style.display = 'flex';
-                }, 500);
-            } else {
-                if (popup) popup.style.display = 'none';
+            // Close popup function
+            function closePopup() {
+                popup.style.display = 'none';
+                localStorage.setItem('popupShown', 'true');
             }
             
-            // Close popup when button is clicked
+            // Show popup function
+            function showPopup() {
+                popup.style.display = 'flex';
+            }
+            
+            // Check if popup has been shown before
+            if (localStorage.getItem('popupShown')) {
+                popup.style.display = 'none';
+            } else {
+                popup.style.display = 'flex';
+            }
+            
+            // Add click event to close button
             if (closePopupBtn) {
                 closePopupBtn.onclick = function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    window.closeInfoPopup();
+                    closePopup();
                 };
             }
             
             // Reminder button to show popup again
             if (reminderBtn) {
                 reminderBtn.onclick = function() {
-                    window.showInfoPopup();
+                    showPopup();
                 };
             }
             
-            // Close popup when clicking outside the card
-            if (popup) {
-                popup.onclick = function(e) {
-                    if (e.target === popup) {
-                        window.closeInfoPopup();
-                    }
-                };
-            }
+            // Close popup when clicking outside
+            popup.onclick = function(e) {
+                if (e.target === popup) {
+                    closePopup();
+                }
+            };
             
             function getWeekNumber() {
                 const now = new Date();
@@ -696,4 +691,6 @@
                 if (gameRunning) bird.velocity = -5.2; 
             }
             
-            function create
+            function createPipe() { 
+                let minH = 80, maxH = canvas.height - 180, topH = Math.random() * (maxH - minH) + minH; 
+                pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH + 150,
