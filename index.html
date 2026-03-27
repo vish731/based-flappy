@@ -190,13 +190,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.95);
             backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
-            animation: fadeIn 0.3s ease;
         }
         .popup-card {
             background: linear-gradient(135deg, #1A1F2E, #0F1425);
@@ -206,7 +205,6 @@
             width: 90%;
             border: 1px solid rgba(59,130,246,0.4);
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            animation: slideUp 0.4s ease;
         }
         .popup-header {
             text-align: center;
@@ -301,20 +299,6 @@
         }
         .reminder-btn:hover {
             transform: scale(1.1);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -459,45 +443,60 @@
             canvas.width = 400;
             canvas.height = 600;
             
-            // POPUP HANDLING
+            // ========== POPUP HANDLING - FIXED ==========
             const popup = document.getElementById('infoPopup');
             const closePopupBtn = document.getElementById('closePopupBtn');
             const reminderBtn = document.getElementById('reminderBtn');
+            
+            // Function to close popup
+            window.closeInfoPopup = function() {
+                if (popup) {
+                    popup.style.display = 'none';
+                    localStorage.setItem('popupShown', 'true');
+                }
+            };
+            
+            // Function to show popup
+            window.showInfoPopup = function() {
+                if (popup) {
+                    popup.style.display = 'flex';
+                }
+            };
             
             // Check if popup has been shown before
             if (!localStorage.getItem('popupShown')) {
                 // Show popup after 0.5 seconds
                 setTimeout(() => {
-                    popup.classList.remove('hidden');
+                    if (popup) popup.style.display = 'flex';
                 }, 500);
             } else {
-                popup.classList.add('hidden');
+                if (popup) popup.style.display = 'none';
             }
             
-            // Close popup function
-            function closePopup() {
-                popup.classList.add('hidden');
-                localStorage.setItem('popupShown', 'true');
-            }
-            
-            // Event listeners for closing popup
+            // Close popup when button is clicked
             if (closePopupBtn) {
-                closePopupBtn.addEventListener('click', closePopup);
+                closePopupBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.closeInfoPopup();
+                };
             }
             
             // Reminder button to show popup again
             if (reminderBtn) {
-                reminderBtn.addEventListener('click', () => {
-                    popup.classList.remove('hidden');
-                });
+                reminderBtn.onclick = function() {
+                    window.showInfoPopup();
+                };
             }
             
-            // Close popup when clicking outside (optional)
-            popup.addEventListener('click', (e) => {
-                if (e.target === popup) {
-                    closePopup();
-                }
-            });
+            // Close popup when clicking outside the card
+            if (popup) {
+                popup.onclick = function(e) {
+                    if (e.target === popup) {
+                        window.closeInfoPopup();
+                    }
+                };
+            }
             
             function getWeekNumber() {
                 const now = new Date();
@@ -697,5 +696,4 @@
                 if (gameRunning) bird.velocity = -5.2; 
             }
             
-            function createPipe() { 
-                let minH =
+            function create
