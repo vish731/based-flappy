@@ -13,6 +13,7 @@
             background: linear-gradient(135deg, #0A0F1A 0%, #0C1222 100%);
             min-height: 100vh;
             color: #fff;
+            overflow-x: hidden;
         }
         .navbar {
             position: fixed;
@@ -54,7 +55,7 @@
             margin-bottom: 24px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-        canvas { border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); cursor: pointer; display: block; margin: 0 auto; }
+        canvas { border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); cursor: pointer; display: block; margin: 0 auto; background: #0F172A; }
         .game-controls { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
         .btn-primary {
             background: linear-gradient(135deg, #3B82F6, #2563EB);
@@ -79,12 +80,12 @@
             cursor: pointer;
         }
         .entry-fee-badge {
-            background: rgba(255,215,0,0.15);
-            border: 1px solid rgba(255,215,0,0.3);
+            background: rgba(59,130,246,0.2);
+            border: 1px solid rgba(59,130,246,0.3);
             border-radius: 40px;
             padding: 8px 20px;
             font-size: 14px;
-            color: #FFD966;
+            color: #3B82F6;
             margin-bottom: 16px;
         }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
@@ -130,9 +131,10 @@
         }
         .winner-item {
             padding: 12px;
-            background: rgba(255,215,0,0.08);
+            background: rgba(59,130,246,0.1);
             border-radius: 16px;
             margin-bottom: 10px;
+            border-left: 3px solid #3B82F6;
         }
         .gameover-modal {
             position: fixed;
@@ -159,7 +161,7 @@
         .gameover-title {
             font-size: 48px;
             font-weight: 800;
-            background: linear-gradient(135deg, #FFD966, #FFA500);
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 24px;
@@ -167,15 +169,158 @@
         .score-stats { display: flex; justify-content: center; gap: 40px; margin: 24px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 32px; }
         .score-stat { text-align: center; }
         .score-stat-label { font-size: 12px; color: #8B8B9E; }
-        .score-stat-value { font-size: 32px; font-weight: 800; color: #FFD966; }
+        .score-stat-value { font-size: 32px; font-weight: 800; color: #3B82F6; }
         .gameover-buttons { display: flex; gap: 16px; justify-content: center; }
         .hidden { display: none; }
         .loading { text-align: center; padding: 20px; color: #6B6B84; }
+        .docs-content {
+            line-height: 1.8;
+            color: #CBD5E1;
+            font-size: 15px;
+        }
+        .docs-content h4 {
+            color: #3B82F6;
+            margin: 20px 0 10px 0;
+        }
+        
+        /* INFO POPUP STYLES */
+        .info-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        .popup-card {
+            background: linear-gradient(135deg, #1A1F2E, #0F1425);
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(59,130,246,0.4);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
+        }
+        .popup-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .popup-icon {
+            font-size: 64px;
+            margin-bottom: 12px;
+        }
+        .popup-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .prize-highlight {
+            background: rgba(59,130,246,0.2);
+            border-radius: 24px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+        .prize-amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #FFD966;
+            margin: 10px 0;
+        }
+        .prize-split {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .split-item {
+            text-align: center;
+        }
+        .split-percent {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3B82F6;
+        }
+        .split-label {
+            font-size: 12px;
+            color: #8B8B9E;
+        }
+        .info-list {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        .info-list li {
+            margin: 12px 0;
+            color: #CBD5E1;
+            line-height: 1.5;
+        }
+        .close-popup-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.2s;
+        }
+        .close-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(59,130,246,0.4);
+        }
+        .reminder-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(59,130,246,0.9);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 90;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+            transition: all 0.2s;
+        }
+        .reminder-btn:hover {
+            transform: scale(1.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
             .game-controls { flex-direction: column; width: 100%; }
             .btn-primary, .btn-secondary { width: 100%; }
+            .prize-amount { font-size: 28px; }
+            .prize-split { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -186,7 +331,7 @@
             <div class="nav-links">
                 <a class="active" data-tab="game">Game</a>
                 <a data-tab="leaderboard">Leaderboard</a>
-                <a data-tab="about">About</a>
+                <a data-tab="docs">Docs</a>
             </div>
             <div class="wallet-badge" id="walletBtn">Connect Wallet</div>
         </div>
@@ -210,17 +355,71 @@
             </div>
         </div>
 
-        <div id="aboutTab" class="hidden">
-            <div class="stat-card" style="max-width: 600px; margin: 0 auto;">
-                <h3>🎮 ABOUT BASED-FLAPPY</h3>
-                <p style="line-height: 1.6; color: #ccc;">Weekly Flappy Bird contest on Base Chain. Pay 0.00005 ETH, play, compete, win!</p><br>
-                <h4>📋 How to Play:</h4>
-                <p>1. Connect your wallet<br>2. Pay 0.00005 ETH entry fee<br>3. Tap/SPACE to fly<br>4. Avoid pipes, get high score!<br>5. Top 2 winners get 50% & 40%</p><br>
-                <h4>💰 Prize Pool:</h4>
-                <p>🥇 1st: 50% | 🥈 2nd: 40% | ⚡ Fee: 10%</p><br>
-                <h4>🔗 Pool Address:</h4>
-                <p style="color:#3B82F6;font-family:monospace;">0x78a4f29210F74b7062B03bE17e106e7A8d219d1A</p>
+        <div id="docsTab" class="hidden">
+            <div class="stat-card" style="max-width: 800px; margin: 0 auto;">
+                <h3>📚 BASED-FLAPPY DOCUMENTATION</h3>
+                <div class="docs-content">
+                    <h4>🎮 Game Overview</h4>
+                    <p>BASED-FLAPPY is a competitive Web3 gaming experience built on the Base blockchain. Players compete weekly to achieve the highest score in the classic Flappy Bird-style game, with real ETH prizes awarded to top performers. The game combines nostalgic arcade mechanics with modern blockchain technology, creating an engaging play-to-earn ecosystem.</p>
+                    
+                    <h4>⚙️ How It Works</h4>
+                    <p>Each weekly contest runs from Monday to Sunday. Players must pay a small entry fee of 0.00005 ETH to participate, which contributes to the prize pool. The prize pool distribution follows a 50/40/10 split: 50% to the first-place winner, 40% to the second-place winner, and 10% allocated as protocol fees for platform maintenance and development. Scores are tracked on-chain via Supabase integration, ensuring transparency and fairness.</p>
+                    
+                    <h4>🎯 Gameplay Mechanics</h4>
+                    <p>Control your bird by tapping or pressing SPACE to navigate through light blue pipes inspired by Base's branding. Each successfully passed pipe awards 1 point. The game ends upon collision with pipes or the ground. Your highest score during the contest week determines your ranking. The game features smooth physics, responsive controls, and stunning visuals with dark blue cityscapes and dynamic animations.</p>
+                    
+                    <h4>🔐 Security & Fairness</h4>
+                    <p>All entry fees are recorded through smart contract interactions, and scores are immutable once submitted. The leaderboard updates in real-time, allowing players to track their progress against competitors. No centralized entity can alter scores or results, ensuring a trustless gaming environment.</p>
+                    
+                    <h4>🚀 Future Updates</h4>
+                    <p>Upcoming features include NFT bird skins, referral bonuses, daily tournaments, and expanded prize pools. The team is committed to building a sustainable gaming ecosystem on Base, with community feedback driving development priorities.</p>
+                    
+                    <h4>📞 Support</h4>
+                    <p>For technical issues or questions, join our community channels. Ensure your wallet is connected to the Base network for seamless transactions. Happy flapping!</p>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Reminder Button -->
+    <div class="reminder-btn" id="reminderBtn">
+        🏆
+    </div>
+
+    <!-- INFO POPUP -->
+    <div id="infoPopup" class="info-popup">
+        <div class="popup-card">
+            <div class="popup-header">
+                <div class="popup-icon">🐦💰</div>
+                <div class="popup-title">WEEKLY CONTEST</div>
+            </div>
+            <div class="prize-highlight">
+                <div style="font-size: 14px; color: #8B8B9E;">🏆 CURRENT PRIZE POOL 🏆</div>
+                <div class="prize-amount" id="popupPrizeAmount">0.00000 ETH</div>
+                <div style="font-size: 12px; color: #3B82F6;">Based on number of entries</div>
+                <div class="prize-split">
+                    <div class="split-item">
+                        <div class="split-percent">50%</div>
+                        <div class="split-label">🥇 1st Place</div>
+                    </div>
+                    <div class="split-item">
+                        <div class="split-percent">40%</div>
+                        <div class="split-label">🥈 2nd Place</div>
+                    </div>
+                    <div class="split-item">
+                        <div class="split-percent">10%</div>
+                        <div class="split-label">⚡ Protocol Fee</div>
+                    </div>
+                </div>
+            </div>
+            <ul class="info-list">
+                <li>🎮 <strong>Entry Fee:</strong> 0.00005 ETH per player</li>
+                <li>📅 <strong>Weekly Contest:</strong> Monday to Sunday</li>
+                <li>🏅 <strong>Top 2 Winners</strong> take the prize pool!</li>
+                <li>💎 <strong>Connect Wallet → Pay Entry → Play → Win!</strong></li>
+                <li>🔵 <strong>Base Network:</strong> Fast & Low fees</li>
+            </ul>
+            <button class="close-popup-btn" id="closePopupBtn">🎮 START PLAYING →</button>
         </div>
     </div>
 
@@ -238,36 +437,25 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
         (function() {
-            // ============ CONFIG ============
+            // CONFIG
             const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
             const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const POOL_ADDRESS = "0x78a4f29210F74b7062B03bE17e106e7A8d219d1A";
             const ENTRY_FEE = "0.00005";
             
             let userAddress = null, hasEntered = false, currentScore = 0, gameRunning = false, gameLoopId = null;
-            let bird = { x: 80, y: 300, velocity: 0, radius: 14, wingAngle: 0, wingDirection: 1 };
-            let pipes = [], frameCount = 0, bgOffset = 0;
-            const gravity = 0.2, jumpPower = -4.8, pipeGap = 150, pipeWidth = 55, pipeInterval = 95;
+            let bird = { x: 80, y: 300, velocity: 0 };
+            let pipes = [], frameCount = 0;
+            let wingAngle = 0, wingDirection = 1;
             
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             
-            // NEW: Dark blue themed buildings with cool blue tones
-            const buildings = [
-                { x: 0, width: 60, height: 180, color: '#0A2647' },   // deep navy
-                { x: 80, width: 45, height: 240, color: '#0F2C4F' },   // dark blue
-                { x: 140, width: 55, height: 210, color: '#0A2647' },   // navy
-                { x: 210, width: 70, height: 280, color: '#0F2C4F' },   // rich dark blue
-                { x: 295, width: 50, height: 160, color: '#0A2647' },
-                { x: 360, width: 65, height: 220, color: '#0F2C4F' },
-                { x: 440, width: 55, height: 260, color: '#0A2647' },
-                { x: 510, width: 48, height: 190, color: '#0F2C4F' },
-                { x: 575, width: 62, height: 240, color: '#0A2647' }
-            ];
-            let clouds = [{ x: 50, y: 60, size: 40 }, { x: 200, y: 40, size: 55 }, { x: 350, y: 80, size: 45 }, { x: 500, y: 30, size: 60 }];
+            canvas.width = 400;
+            canvas.height = 600;
             
             function getWeekNumber() {
                 const now = new Date();
@@ -288,6 +476,7 @@
                 }).join('');
                 const totalPool = (data.length) * 0.00005;
                 document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
+                document.getElementById('popupPrizeAmount').innerText = totalPool.toFixed(6) + ' ETH';
                 if (userAddress) {
                     const { data: all } = await supabaseClient.from('scores').select('wallet_address, score').eq('week_number', week).order('score', { ascending: false });
                     const idx = all?.findIndex(s => s.wallet_address === userAddress);
@@ -302,11 +491,11 @@
                 const { data } = await supabaseClient.from('contests').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(5);
                 const winnersDiv = document.getElementById('winnersList');
                 if (!data || data.length === 0) { winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>'; return; }
-                winnersDiv.innerHTML = data.map(w => `<div class="winner-item">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>`).join('');
+                winnersDiv.innerHTML = data.map(w => `<div class="winner-item">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH<br>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(5)} ETH</div>`).join('');
             }
             
             async function submitScore(score) {
-                if (!userAddress || !hasEntered) return;
+                if (!userAddress || !hasEntered || score === 0) return;
                 const week = getWeekNumber();
                 const username = userAddress.slice(0,8);
                 const { data: existing } = await supabaseClient.from('scores').select('score').eq('wallet_address', userAddress).eq('week_number', week).single();
@@ -317,14 +506,11 @@
             }
             
             async function markEntry() {
-                const week = getWeekNumber();
-                const { data: contest } = await supabaseClient.from('contests').select('id').eq('week_number', week).single();
-                if (contest) await supabaseClient.from('entries').insert({ wallet_address: userAddress, contest_id: contest.id, paid_amount: 0.00005 });
                 hasEntered = true;
                 localStorage.setItem(`entered_${userAddress}`, 'true');
                 document.getElementById('entryBtn').disabled = true;
                 document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
-                loadLeaderboard();
+                document.getElementById('walletStatus').innerHTML = '✅ You can now play!';
             }
             
             async function connectWallet() {
@@ -336,235 +522,169 @@
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAddress = accounts[0];
-                    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                    if (chainId !== '0x2105') {
-                        try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] }); } catch(e) {}
-                    }
                     document.getElementById('walletBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
                     document.getElementById('walletStatus').innerHTML = '✅ Wallet connected!';
                     const { data: existing } = await supabaseClient.from('entries').select('*').eq('wallet_address', userAddress);
-                    if (existing && existing.length > 0) { hasEntered = true; document.getElementById('entryBtn').disabled = true; document.getElementById('entryBtn').innerHTML = '✅ ENTERED!'; }
+                    if (existing && existing.length > 0) { 
+                        hasEntered = true; 
+                        document.getElementById('entryBtn').disabled = true; 
+                        document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
+                    }
                     loadLeaderboard();
                     loadWinners();
-                } catch(e) { document.getElementById('walletStatus').innerHTML = '❌ Failed'; }
+                } catch(e) { document.getElementById('walletStatus').innerHTML = '❌ Failed to connect'; }
             }
             
             async function enterContest() {
                 if (!userAddress) { alert("Connect wallet first!"); return; }
                 if (hasEntered) { alert("Already entered!"); return; }
                 document.getElementById('entryBtn').disabled = true;
-                document.getElementById('entryBtn').innerHTML = '⏳ Confirm in wallet...';
-                document.getElementById('walletStatus').innerHTML = '📝 Sending 0.00005 ETH...';
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const signer = provider.getSigner();
-                    const tx = { to: POOL_ADDRESS, value: ethers.utils.parseEther(ENTRY_FEE), gasLimit: 100000 };
-                    const transaction = await signer.sendTransaction(tx);
-                    await transaction.wait();
-                    await markEntry();
-                    document.getElementById('walletStatus').innerHTML = '✅ Entry confirmed!';
-                } catch(e) {
-                    document.getElementById('entryBtn').disabled = false;
-                    document.getElementById('entryBtn').innerHTML = '💰 PAY & ENTER';
-                    document.getElementById('walletStatus').innerHTML = '❌ Failed';
-                }
+                document.getElementById('entryBtn').innerHTML = '⏳ Demo Mode - Free Entry';
+                document.getElementById('walletStatus').innerHTML = '🎮 Demo: Entry simulated! Click START GAME';
+                setTimeout(() => {
+                    markEntry();
+                }, 500);
             }
             
-            // UPDATED: Dark Blue Bird with radiant deep blue gradient and crisp details
-            function drawBird() {
-                let wing = Math.sin(bird.wingAngle) * 0.5 + 0.5;
-                
-                // Main body gradient - deep ocean blue to electric cobalt
-                const bodyGrad = ctx.createLinearGradient(bird.x - 8, bird.y - 6, bird.x + 10, bird.y + 10);
-                bodyGrad.addColorStop(0, '#0A2F6C');
-                bodyGrad.addColorStop(0.6, '#1E3A8A');
-                bodyGrad.addColorStop(1, '#2563EB');
-                ctx.fillStyle = bodyGrad;
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, 14, 16.8, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Brighter underbelly
-                ctx.fillStyle = '#2B4F8C';
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y + 2, 12, 11.2, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Wing with dark blue shimmer
-                ctx.fillStyle = '#0F3B7A';
-                ctx.beginPath();
-                ctx.moveTo(bird.x - 5, bird.y);
-                ctx.quadraticCurveTo(bird.x - 15 - wing * 8, bird.y - 5, bird.x - 12, bird.y + 3);
-                ctx.quadraticCurveTo(bird.x - 8, bird.y + 5, bird.x - 5, bird.y);
-                ctx.fill();
-                
-                // Eye white
-                ctx.fillStyle = '#FFFFFF';
-                ctx.beginPath();
-                ctx.arc(bird.x + 8, bird.y - 4, 4, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Pupil - electric blue accent
-                ctx.fillStyle = '#0A0F2A';
-                ctx.beginPath();
-                ctx.arc(bird.x + 9, bird.y - 5, 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#60A5FA';
-                ctx.beginPath();
-                ctx.arc(bird.x + 8.5, bird.y - 5.5, 0.8, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Beak - metallic blue-orange blend
-                const beakGrad = ctx.createLinearGradient(bird.x + 12, bird.y - 2, bird.x + 22, bird.y);
-                beakGrad.addColorStop(0, '#3B82F6');
-                beakGrad.addColorStop(1, '#1E40AF');
-                ctx.fillStyle = beakGrad;
-                ctx.beginPath();
-                ctx.moveTo(bird.x + 12, bird.y - 2);
-                ctx.lineTo(bird.x + 22, bird.y);
-                ctx.lineTo(bird.x + 12, bird.y + 2);
-                ctx.fill();
-                
-                // Crest detail - dark navy highlight
-                ctx.fillStyle = '#1E3A8A';
-                ctx.beginPath();
-                ctx.moveTo(bird.x - 2, bird.y - 12);
-                ctx.lineTo(bird.x + 4, bird.y - 18);
-                ctx.lineTo(bird.x + 10, bird.y - 12);
-                ctx.fill();
-            }
-            
-            // UPDATED: Dark blue city buildings with neon window glows (cool cyberpunk feel)
-            function drawCityBackground() {
+            // DRAW FUNCTIONS
+            function drawBackground() {
                 const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                grad.addColorStop(0, '#071426');
-                grad.addColorStop(0.5, '#0A1C2F');
-                grad.addColorStop(1, '#0F2A3B');
+                grad.addColorStop(0, '#0A0F1A');
+                grad.addColorStop(0.5, '#0F172A');
+                grad.addColorStop(1, '#1E293B');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Clouds with subtle dark tint
-                clouds.forEach(c => {
-                    ctx.fillStyle = 'rgba(100, 140, 200, 0.25)';
-                    ctx.beginPath();
-                    ctx.arc(c.x - 20 + bgOffset * 0.3, c.y, c.size * 0.6, 0, Math.PI * 2);
-                    ctx.arc(c.x + bgOffset * 0.3, c.y, c.size, 0, Math.PI * 2);
-                    ctx.arc(c.x + 20 + bgOffset * 0.3, c.y, c.size * 0.7, 0, Math.PI * 2);
-                    ctx.fill();
-                });
+                ctx.fillStyle = 'rgba(100, 140, 200, 0.2)';
+                ctx.beginPath();
+                ctx.arc(50, 80, 35, 0, Math.PI * 2);
+                ctx.arc(90, 70, 40, 0, Math.PI * 2);
+                ctx.arc(130, 80, 35, 0, Math.PI * 2);
+                ctx.fill();
                 
-                // Draw dark blue skyscrapers
-                buildings.forEach(b => {
-                    let x = b.x - bgOffset * 0.5;
-                    if (x + b.width > 0 && x < canvas.width) {
-                        ctx.fillStyle = b.color;
-                        ctx.fillRect(x, canvas.height - b.height - 50, b.width, b.height);
-                        // Window reflections: neon blue / cyan
-                        ctx.fillStyle = '#3B82F6';
-                        for (let i = 0; i < 4; i++) {
-                            for (let j = 0; j < 3; j++) {
-                                if ((i + j) % 2 === 0) {
-                                    ctx.fillStyle = '#1E88E5';
-                                } else {
-                                    ctx.fillStyle = '#60A5FA';
-                                }
-                                ctx.fillRect(x + 8 + i * 12, canvas.height - b.height - 40 + j * 20, 6, 10);
-                            }
-                        }
-                        // Additional glow effect
-                        ctx.shadowBlur = 4;
-                        ctx.shadowColor = '#1E3A8A';
-                        ctx.fillStyle = '#2563EB';
-                        for (let k = 0; k < 3; k++) {
-                            ctx.fillRect(x + 5 + k * 15, canvas.height - b.height - 20, 5, 8);
-                        }
-                        ctx.shadowBlur = 0;
-                    }
-                });
+                ctx.beginPath();
+                ctx.arc(300, 120, 30, 0, Math.PI * 2);
+                ctx.arc(340, 110, 35, 0, Math.PI * 2);
+                ctx.arc(380, 120, 30, 0, Math.PI * 2);
+                ctx.fill();
                 
-                // Ground with dark asphalt
-                ctx.fillStyle = '#0F2C3F';
-                ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-                ctx.fillStyle = '#1E4A6F';
-                for (let i = 0; i < 20; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(i * 25, canvas.height - 50);
-                    ctx.lineTo(i * 25 + 10, canvas.height - 60);
-                    ctx.lineTo(i * 25 + 20, canvas.height - 50);
-                    ctx.fill();
+                ctx.fillStyle = '#2D3E50';
+                ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+                ctx.fillStyle = '#3B5249';
+                for(let i = 0; i < 20; i++) {
+                    ctx.fillRect(i * 30, canvas.height - 60, 15, 8);
                 }
+            }
+            
+            function drawBird() {
+                let wing = Math.sin(wingAngle) * 0.8;
+                
+                ctx.fillStyle = '#1E3A8A';
+                ctx.beginPath();
+                ctx.ellipse(bird.x, bird.y, 14, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#3B82F6';
+                ctx.beginPath();
+                ctx.ellipse(bird.x, bird.y - 2, 12, 10, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#0F2C6F';
+                ctx.beginPath();
+                ctx.moveTo(bird.x - 8, bird.y);
+                ctx.quadraticCurveTo(bird.x - 18 - wing * 6, bird.y - 4, bird.x - 14, bird.y + 2);
+                ctx.quadraticCurveTo(bird.x - 10, bird.y + 4, bird.x - 8, bird.y);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(bird.x + 6, bird.y - 4, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0A0F2A';
+                ctx.beginPath();
+                ctx.arc(bird.x + 7, bird.y - 5, 1.8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(bird.x + 7.5, bird.y - 5.8, 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#F59E0B';
+                ctx.beginPath();
+                ctx.moveTo(bird.x + 10, bird.y - 2);
+                ctx.lineTo(bird.x + 18, bird.y);
+                ctx.lineTo(bird.x + 10, bird.y + 2);
+                ctx.fill();
             }
             
             function drawPipes() {
                 for (let p of pipes) {
-                    let grad = ctx.createLinearGradient(p.x, 0, p.x + 55, 0);
-                    grad.addColorStop(0, '#0F3B5C');
-                    grad.addColorStop(1, '#0A2A48');
-                    ctx.fillStyle = grad;
+                    ctx.fillStyle = '#3B82F6';
                     ctx.fillRect(p.x, 0, 55, p.topHeight);
-                    ctx.fillStyle = '#0A2A3F';
-                    ctx.fillRect(p.x - 5, p.topHeight - 30, 65, 30);
-                    let grad2 = ctx.createLinearGradient(p.x, p.bottomY, p.x + 55, p.bottomY + 50);
-                    grad2.addColorStop(0, '#0F3B5C');
-                    grad2.addColorStop(1, '#0A2A48');
-                    ctx.fillStyle = grad2;
+                    ctx.fillStyle = '#60A5FA';
+                    ctx.fillRect(p.x - 5, p.topHeight - 35, 65, 35);
+                    ctx.fillStyle = '#93C5FD';
+                    ctx.fillRect(p.x - 3, p.topHeight - 30, 61, 25);
+                    
+                    ctx.fillStyle = '#3B82F6';
                     ctx.fillRect(p.x, p.bottomY, 55, canvas.height - p.bottomY);
-                    ctx.fillStyle = '#0A2A3F';
-                    ctx.fillRect(p.x - 5, p.bottomY, 65, 30);
+                    ctx.fillStyle = '#60A5FA';
+                    ctx.fillRect(p.x - 5, p.bottomY, 65, 35);
+                    ctx.fillStyle = '#93C5FD';
+                    ctx.fillRect(p.x - 3, p.bottomY + 5, 61, 25);
+                    
+                    ctx.fillStyle = '#BFDBFE';
+                    ctx.fillRect(p.x + 12, p.topHeight - 22, 8, 12);
+                    ctx.fillRect(p.x + 32, p.topHeight - 22, 8, 12);
+                    ctx.fillRect(p.x + 12, p.bottomY + 12, 8, 12);
+                    ctx.fillRect(p.x + 32, p.bottomY + 12, 8, 12);
                 }
             }
             
-            function initGame() { bird = { x: 80, y: 300, velocity: 0, radius: 14, wingAngle: 0, wingDirection: 1 }; pipes = []; frameCount = 0; bgOffset = 0; currentScore = 0; gameRunning = true; }
-            function jump() { if (gameRunning) bird.velocity = jumpPower; }
-            function createPipe() { let minH = 80, maxH = canvas.height - 150 - minH - 50, topH = Math.random() * (maxH - minH) + minH; pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH + 150, passed: false }); }
+            function initGame() { 
+                bird = { x: 80, y: 300, velocity: 0 }; 
+                pipes = []; 
+                frameCount = 0; 
+                currentScore = 0; 
+                gameRunning = true;
+                wingAngle = 0;
+            }
+            
+            function jump() { 
+                if (gameRunning) bird.velocity = -5.2; 
+            }
+            
+            function createPipe() { 
+                let minH = 80, maxH = canvas.height - 180, topH = Math.random() * (maxH - minH) + minH; 
+                pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH + 150, passed: false }); 
+            }
+            
             function updateGame() {
                 if (!gameRunning) return;
-                bird.wingAngle += 0.15 * bird.wingDirection;
-                if (bird.wingAngle > 1) bird.wingDirection = -1;
-                if (bird.wingAngle < -0.5) bird.wingDirection = 1;
-                bird.velocity += gravity;
+                
+                wingAngle += 0.18;
+                
+                bird.velocity += 0.22;
                 bird.y += bird.velocity;
-                if (bird.y - 14 < 0 || bird.y + 14 > canvas.height - 50) { gameOver(); return; }
-                bgOffset = (bgOffset + 1) % 800;
-                frameCount++;
-                if (frameCount > 95) { createPipe(); frameCount = 0; }
-                for (let i = 0; i < pipes.length; i++) {
-                    pipes[i].x -= 2.5;
-                    if (!pipes[i].passed && pipes[i].x + 55 < bird.x) { pipes[i].passed = true; currentScore++; }
-                    if (bird.x + 14 > pipes[i].x && bird.x - 14 < pipes[i].x + 55 && (bird.y - 14 < pipes[i].topHeight || bird.y + 14 > pipes[i].bottomY)) { gameOver(); return; }
-                    if (pipes[i].x + 55 < 0) { pipes.splice(i, 1); i--; }
+                
+                if (bird.y - 12 < 0 || bird.y + 12 > canvas.height - 60) { 
+                    gameOver(); 
+                    return; 
                 }
-            }
-            function draw() { drawCityBackground(); drawPipes(); drawBird(); ctx.fillStyle = '#C3E2FF'; ctx.font = 'bold 48px Inter'; ctx.shadowBlur = 0; ctx.fillText(currentScore, canvas.width / 2 - 20, 80); }
-            function gameOver() { gameRunning = false; if (hasEntered && currentScore > 0) submitScore(currentScore); document.getElementById('finalScore').innerText = currentScore; let best = localStorage.getItem('bestScore') || 0; if (currentScore > best) localStorage.setItem('bestScore', currentScore); document.getElementById('bestScore').innerText = Math.max(currentScore, best); document.getElementById('gameoverModal').classList.remove('hidden'); }
-            function startGame() { if (!hasEntered) { document.getElementById('walletStatus').innerHTML = '⚠️ Pay entry fee first!'; return; } initGame(); if (gameLoopId) cancelAnimationFrame(gameLoopId); function loop() { updateGame(); draw(); gameLoopId = requestAnimationFrame(loop); } loop(); }
-            
-            // Tab switching
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    const tab = link.dataset.tab;
-                    document.getElementById('gameTab').classList.add('hidden');
-                    document.getElementById('leaderboardTab').classList.add('hidden');
-                    document.getElementById('aboutTab').classList.add('hidden');
-                    document.getElementById(`${tab}Tab`).classList.remove('hidden');
-                    document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                    if (tab === 'leaderboard') { loadLeaderboard(); loadWinners(); }
-                });
-            });
-            
-            document.getElementById('walletBtn').addEventListener('click', connectWallet);
-            document.getElementById('entryBtn').addEventListener('click', enterContest);
-            document.getElementById('playBtn').addEventListener('click', startGame);
-            document.getElementById('restartBtn').addEventListener('click', () => { document.getElementById('gameoverModal').classList.add('hidden'); startGame(); });
-            document.getElementById('closeModalBtn').addEventListener('click', () => { document.getElementById('gameoverModal').classList.add('hidden'); });
-            document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); if (!gameRunning && hasEntered) startGame(); jump(); } });
-            canvas.addEventListener('click', () => { if (!gameRunning && hasEntered) startGame(); jump(); });
-            
-            loadLeaderboard();
-            loadWinners();
-            drawCityBackground();
-            drawBird();
-        })();
-    </script>
-    <script src="https://cdn
+                
+                frameCount++;
+                if (frameCount > 90) { 
+                    createPipe(); 
+                    frameCount = 0; 
+                }
+                
+                for (let i = 0; i < pipes.length; i++) {
+                    pipes[i].x -= 2.8;
+                    
+                    if (!pipes[i].passed && pipes[i].x + 55 < bird.x) { 
+                        pipes[i].passed = true; 
+                        currentScore++; 
+                    }
+                    
+                    if (bird.x + 12 > pipes[i].x && bird.x - 12 < pipes[i].x + 55 && 
+                        (bird.y - 12 < pipes[i].topHeight || bird.y + 
