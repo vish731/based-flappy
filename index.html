@@ -426,271 +426,259 @@
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
-        (function() {
-            // CONFIG
-            const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
-            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const ENTRY_FEE = "0.00005";
-            
-            let userAddress = null, hasEntered = false, currentScore = 0, gameRunning = false, gameLoopId = null;
-            let bird = { x: 80, y: 300, velocity: 0 };
-            let pipes = [], frameCount = 0;
-            let wingAngle = 0;
-            
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.width = 400;
-            canvas.height = 600;
-            
-            // ========== POPUP HANDLING - FIXED ==========
-            const popup = document.getElementById('infoPopup');
-            const closePopupBtn = document.getElementById('closePopupBtn');
-            const reminderBtn = document.getElementById('reminderBtn');
-            
-            // Hide popup initially
+        // CONFIG
+        const SUPABASE_URL = "https://bsmuxnnjclhcuecpybkp.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let userAddress = null, hasEntered = false, currentScore = 0, gameRunning = false, gameLoopId = null;
+        let bird = { x: 80, y: 300, velocity: 0 };
+        let pipes = [], frameCount = 0;
+        let wingAngle = 0;
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 600;
+        
+        // ========== POPUP HANDLING - 100% WORKING ==========
+        const popup = document.getElementById('infoPopup');
+        const closeBtn = document.getElementById('closePopupBtn');
+        const reminder = document.getElementById('reminderBtn');
+        
+        // Close popup function
+        function closePopup() {
+            popup.style.display = 'none';
+            localStorage.setItem('popupShown', 'true');
+        }
+        
+        // Show popup function
+        function showPopup() {
             popup.style.display = 'flex';
-            
-            // Close popup function
-            function closePopup() {
-                popup.style.display = 'none';
-                localStorage.setItem('popupShown', 'true');
+        }
+        
+        // Check if popup should be shown
+        if (localStorage.getItem('popupShown')) {
+            popup.style.display = 'none';
+        } else {
+            popup.style.display = 'flex';
+        }
+        
+        // Add click event to close button (MAIN FIX)
+        closeBtn.onclick = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            closePopup();
+        };
+        
+        // Reminder button click
+        reminder.onclick = function() {
+            showPopup();
+        };
+        
+        // Close when clicking outside
+        popup.onclick = function(event) {
+            if (event.target === popup) {
+                closePopup();
             }
-            
-            // Show popup function
-            function showPopup() {
-                popup.style.display = 'flex';
-            }
-            
-            // Check if popup has been shown before
-            if (localStorage.getItem('popupShown')) {
-                popup.style.display = 'none';
-            } else {
-                popup.style.display = 'flex';
-            }
-            
-            // Add click event to close button
-            if (closePopupBtn) {
-                closePopupBtn.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    closePopup();
-                };
-            }
-            
-            // Reminder button to show popup again
-            if (reminderBtn) {
-                reminderBtn.onclick = function() {
-                    showPopup();
-                };
-            }
-            
-            // Close popup when clicking outside
-            popup.onclick = function(e) {
-                if (e.target === popup) {
-                    closePopup();
-                }
-            };
-            
-            function getWeekNumber() {
-                const now = new Date();
-                const start = new Date(now.getFullYear(), 0, 1);
-                const days = Math.floor((now - start) / (24*60*60*1000));
-                return Math.ceil(days / 7);
-            }
-            
-            async function loadLeaderboard() {
-                const week = getWeekNumber();
-                const { data } = await supabaseClient.from('scores').select('wallet_address, username, score').eq('week_number', week).order('score', { ascending: false }).limit(20);
-                const listDiv = document.getElementById('leaderboardList');
-                if (!data || data.length === 0) { listDiv.innerHTML = '<div class="loading">✨ No players yet</div>'; return; }
-                listDiv.innerHTML = data.map((s, i) => {
-                    let rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
-                    let name = s.username || s.wallet_address.slice(0,8);
-                    return `<div class="leaderboard-item"><div class="leaderboard-rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${rank}</div><div class="leaderboard-player"><div class="player-avatar">${name.charAt(0)}</div><span>${name}</span></div><div class="leaderboard-score">${s.score}</div></div>`;
-                }).join('');
-                const totalPool = (data.length) * 0.00005;
-                document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
-                const popupPrize = document.getElementById('popupPrizeAmount');
-                if (popupPrize) popupPrize.innerText = totalPool.toFixed(6) + ' ETH';
-                if (userAddress) {
-                    const { data: all } = await supabaseClient.from('scores').select('wallet_address, score').eq('week_number', week).order('score', { ascending: false });
-                    const idx = all?.findIndex(s => s.wallet_address === userAddress);
-                    if (idx !== undefined && idx !== -1) {
-                        document.getElementById('yourRankDisplay').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${all[idx].score}`;
-                        document.getElementById('yourRankDisplay').classList.remove('hidden');
-                    }
+        };
+        
+        function getWeekNumber() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const days = Math.floor((now - start) / (24*60*60*1000));
+            return Math.ceil(days / 7);
+        }
+        
+        async function loadLeaderboard() {
+            const week = getWeekNumber();
+            const { data } = await supabaseClient.from('scores').select('wallet_address, username, score').eq('week_number', week).order('score', { ascending: false }).limit(20);
+            const listDiv = document.getElementById('leaderboardList');
+            if (!data || data.length === 0) { listDiv.innerHTML = '<div class="loading">✨ No players yet</div>'; return; }
+            listDiv.innerHTML = data.map((s, i) => {
+                let rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+                let name = s.username || s.wallet_address.slice(0,8);
+                return `<div class="leaderboard-item"><div class="leaderboard-rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${rank}</div><div class="leaderboard-player"><div class="player-avatar">${name.charAt(0)}</div><span>${name}</span></div><div class="leaderboard-score">${s.score}</div></div>`;
+            }).join('');
+            const totalPool = (data.length) * 0.00005;
+            document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
+            document.getElementById('popupPrizeAmount').innerText = totalPool.toFixed(6) + ' ETH';
+            if (userAddress) {
+                const { data: all } = await supabaseClient.from('scores').select('wallet_address, score').eq('week_number', week).order('score', { ascending: false });
+                const idx = all?.findIndex(s => s.wallet_address === userAddress);
+                if (idx !== undefined && idx !== -1) {
+                    document.getElementById('yourRankDisplay').innerHTML = `📍 Your Rank: #${idx+1} | Score: ${all[idx].score}`;
+                    document.getElementById('yourRankDisplay').classList.remove('hidden');
                 }
             }
-            
-            async function loadWinners() {
-                const { data } = await supabaseClient.from('contests').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(5);
-                const winnersDiv = document.getElementById('winnersList');
-                if (!data || data.length === 0) { winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>'; return; }
-                winnersDiv.innerHTML = data.map(w => `<div class="winner-item">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH<br>🥈 ${w.winner2_address?.slice(0,8)}... — ${w.winner2_amount?.toFixed(5)} ETH</div>`).join('');
+        }
+        
+        async function loadWinners() {
+            const { data } = await supabaseClient.from('contests').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(5);
+            const winnersDiv = document.getElementById('winnersList');
+            if (!data || data.length === 0) { winnersDiv.innerHTML = '<div class="loading">🏆 No winners yet</div>'; return; }
+            winnersDiv.innerHTML = data.map(w => `<div class="winner-item">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>`).join('');
+        }
+        
+        async function submitScore(score) {
+            if (!userAddress || !hasEntered || score === 0) return;
+            const week = getWeekNumber();
+            const username = userAddress.slice(0,8);
+            const { data: existing } = await supabaseClient.from('scores').select('score').eq('wallet_address', userAddress).eq('week_number', week).single();
+            if (existing && score <= existing.score) return;
+            if (existing) await supabaseClient.from('scores').update({ score, username }).eq('wallet_address', userAddress).eq('week_number', week);
+            else await supabaseClient.from('scores').insert({ wallet_address: userAddress, username, score, week_number: week });
+            loadLeaderboard();
+        }
+        
+        async function markEntry() {
+            hasEntered = true;
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
+            document.getElementById('walletStatus').innerHTML = '✅ You can now play!';
+        }
+        
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Install MetaMask!');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
             }
-            
-            async function submitScore(score) {
-                if (!userAddress || !hasEntered || score === 0) return;
-                const week = getWeekNumber();
-                const username = userAddress.slice(0,8);
-                const { data: existing } = await supabaseClient.from('scores').select('score').eq('wallet_address', userAddress).eq('week_number', week).single();
-                if (existing && score <= existing.score) return;
-                if (existing) await supabaseClient.from('scores').update({ score, username }).eq('wallet_address', userAddress).eq('week_number', week);
-                else await supabaseClient.from('scores').insert({ wallet_address: userAddress, username, score, week_number: week });
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                document.getElementById('walletBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+                document.getElementById('walletStatus').innerHTML = '✅ Wallet connected!';
+                const { data: existing } = await supabaseClient.from('entries').select('*').eq('wallet_address', userAddress);
+                if (existing && existing.length > 0) { 
+                    hasEntered = true; 
+                    document.getElementById('entryBtn').disabled = true; 
+                    document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
+                }
                 loadLeaderboard();
-            }
+                loadWinners();
+            } catch(e) { document.getElementById('walletStatus').innerHTML = '❌ Failed to connect'; }
+        }
+        
+        async function enterContest() {
+            if (!userAddress) { alert("Connect wallet first!"); return; }
+            if (hasEntered) { alert("Already entered!"); return; }
+            document.getElementById('entryBtn').disabled = true;
+            document.getElementById('entryBtn').innerHTML = '⏳ Demo Mode - Free Entry';
+            document.getElementById('walletStatus').innerHTML = '🎮 Demo: Entry simulated! Click START GAME';
+            setTimeout(() => {
+                markEntry();
+            }, 500);
+        }
+        
+        // DRAW FUNCTIONS
+        function drawBackground() {
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#0A0F1A');
+            grad.addColorStop(0.5, '#0F172A');
+            grad.addColorStop(1, '#1E293B');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            async function markEntry() {
-                hasEntered = true;
-                localStorage.setItem(`entered_${userAddress}`, 'true');
-                document.getElementById('entryBtn').disabled = true;
-                document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
-                document.getElementById('walletStatus').innerHTML = '✅ You can now play!';
-            }
+            ctx.fillStyle = 'rgba(100, 140, 200, 0.2)';
+            ctx.beginPath();
+            ctx.arc(50, 80, 35, 0, Math.PI * 2);
+            ctx.arc(90, 70, 40, 0, Math.PI * 2);
+            ctx.arc(130, 80, 35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(300, 120, 30, 0, Math.PI * 2);
+            ctx.arc(340, 110, 35, 0, Math.PI * 2);
+            ctx.arc(380, 120, 30, 0, Math.PI * 2);
+            ctx.fill();
             
-            async function connectWallet() {
-                if (typeof window.ethereum === 'undefined') {
-                    alert('Install MetaMask!');
-                    window.open('https://metamask.io/download/', '_blank');
-                    return;
-                }
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAddress = accounts[0];
-                    document.getElementById('walletBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-                    document.getElementById('walletStatus').innerHTML = '✅ Wallet connected!';
-                    const { data: existing } = await supabaseClient.from('entries').select('*').eq('wallet_address', userAddress);
-                    if (existing && existing.length > 0) { 
-                        hasEntered = true; 
-                        document.getElementById('entryBtn').disabled = true; 
-                        document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
-                    }
-                    loadLeaderboard();
-                    loadWinners();
-                } catch(e) { document.getElementById('walletStatus').innerHTML = '❌ Failed to connect'; }
+            ctx.fillStyle = '#2D3E50';
+            ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+            ctx.fillStyle = '#3B5249';
+            for(let i = 0; i < 20; i++) {
+                ctx.fillRect(i * 30, canvas.height - 60, 15, 8);
             }
-            
-            async function enterContest() {
-                if (!userAddress) { alert("Connect wallet first!"); return; }
-                if (hasEntered) { alert("Already entered!"); return; }
-                document.getElementById('entryBtn').disabled = true;
-                document.getElementById('entryBtn').innerHTML = '⏳ Demo Mode - Free Entry';
-                document.getElementById('walletStatus').innerHTML = '🎮 Demo: Entry simulated! Click START GAME';
-                setTimeout(() => {
-                    markEntry();
-                }, 500);
-            }
-            
-            // DRAW FUNCTIONS
-            function drawBackground() {
-                const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                grad.addColorStop(0, '#0A0F1A');
-                grad.addColorStop(0.5, '#0F172A');
-                grad.addColorStop(1, '#1E293B');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = 'rgba(100, 140, 200, 0.2)';
-                ctx.beginPath();
-                ctx.arc(50, 80, 35, 0, Math.PI * 2);
-                ctx.arc(90, 70, 40, 0, Math.PI * 2);
-                ctx.arc(130, 80, 35, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(300, 120, 30, 0, Math.PI * 2);
-                ctx.arc(340, 110, 35, 0, Math.PI * 2);
-                ctx.arc(380, 120, 30, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#2D3E50';
-                ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
-                ctx.fillStyle = '#3B5249';
-                for(let i = 0; i < 20; i++) {
-                    ctx.fillRect(i * 30, canvas.height - 60, 15, 8);
-                }
-            }
-            
-            function drawBird() {
-                let wing = Math.sin(wingAngle) * 0.8;
-                
-                ctx.fillStyle = '#1E3A8A';
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, 14, 12, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
+        }
+        
+        function drawBird() {
+            let wing = Math.sin(wingAngle) * 0.8;
+            ctx.fillStyle = '#1E3A8A';
+            ctx.beginPath();
+            ctx.ellipse(bird.x, bird.y, 14, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#3B82F6';
+            ctx.beginPath();
+            ctx.ellipse(bird.x, bird.y - 2, 12, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0F2C6F';
+            ctx.beginPath();
+            ctx.moveTo(bird.x - 8, bird.y);
+            ctx.quadraticCurveTo(bird.x - 18 - wing * 6, bird.y - 4, bird.x - 14, bird.y + 2);
+            ctx.quadraticCurveTo(bird.x - 10, bird.y + 4, bird.x - 8, bird.y);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(bird.x + 6, bird.y - 4, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0A0F2A';
+            ctx.beginPath();
+            ctx.arc(bird.x + 7, bird.y - 5, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#F59E0B';
+            ctx.beginPath();
+            ctx.moveTo(bird.x + 10, bird.y - 2);
+            ctx.lineTo(bird.x + 18, bird.y);
+            ctx.lineTo(bird.x + 10, bird.y + 2);
+            ctx.fill();
+        }
+        
+        function drawPipes() {
+            for (let p of pipes) {
                 ctx.fillStyle = '#3B82F6';
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y - 2, 12, 10, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#0F2C6F';
-                ctx.beginPath();
-                ctx.moveTo(bird.x - 8, bird.y);
-                ctx.quadraticCurveTo(bird.x - 18 - wing * 6, bird.y - 4, bird.x - 14, bird.y + 2);
-                ctx.quadraticCurveTo(bird.x - 10, bird.y + 4, bird.x - 8, bird.y);
-                ctx.fill();
-                
-                ctx.fillStyle = 'white';
-                ctx.beginPath();
-                ctx.arc(bird.x + 6, bird.y - 4, 3.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#0A0F2A';
-                ctx.beginPath();
-                ctx.arc(bird.x + 7, bird.y - 5, 1.8, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = 'white';
-                ctx.beginPath();
-                ctx.arc(bird.x + 7.5, bird.y - 5.8, 0.6, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#F59E0B';
-                ctx.beginPath();
-                ctx.moveTo(bird.x + 10, bird.y - 2);
-                ctx.lineTo(bird.x + 18, bird.y);
-                ctx.lineTo(bird.x + 10, bird.y + 2);
-                ctx.fill();
+                ctx.fillRect(p.x, 0, 55, p.topHeight);
+                ctx.fillStyle = '#60A5FA';
+                ctx.fillRect(p.x - 5, p.topHeight - 35, 65, 35);
+                ctx.fillStyle = '#3B82F6';
+                ctx.fillRect(p.x, p.bottomY, 55, canvas.height - p.bottomY);
+                ctx.fillStyle = '#60A5FA';
+                ctx.fillRect(p.x - 5, p.bottomY, 65, 35);
+                ctx.fillStyle = '#BFDBFE';
+                ctx.fillRect(p.x + 12, p.topHeight - 22, 8, 12);
+                ctx.fillRect(p.x + 32, p.topHeight - 22, 8, 12);
+                ctx.fillRect(p.x + 12, p.bottomY + 12, 8, 12);
+                ctx.fillRect(p.x + 32, p.bottomY + 12, 8, 12);
             }
-            
-            function drawPipes() {
-                for (let p of pipes) {
-                    ctx.fillStyle = '#3B82F6';
-                    ctx.fillRect(p.x, 0, 55, p.topHeight);
-                    ctx.fillStyle = '#60A5FA';
-                    ctx.fillRect(p.x - 5, p.topHeight - 35, 65, 35);
-                    ctx.fillStyle = '#93C5FD';
-                    ctx.fillRect(p.x - 3, p.topHeight - 30, 61, 25);
-                    
-                    ctx.fillStyle = '#3B82F6';
-                    ctx.fillRect(p.x, p.bottomY, 55, canvas.height - p.bottomY);
-                    ctx.fillStyle = '#60A5FA';
-                    ctx.fillRect(p.x - 5, p.bottomY, 65, 35);
-                    ctx.fillStyle = '#93C5FD';
-                    ctx.fillRect(p.x - 3, p.bottomY + 5, 61, 25);
-                    
-                    ctx.fillStyle = '#BFDBFE';
-                    ctx.fillRect(p.x + 12, p.topHeight - 22, 8, 12);
-                    ctx.fillRect(p.x + 32, p.topHeight - 22, 8, 12);
-                    ctx.fillRect(p.x + 12, p.bottomY + 12, 8, 12);
-                    ctx.fillRect(p.x + 32, p.bottomY + 12, 8, 12);
-                }
-            }
-            
-            function initGame() { 
-                bird = { x: 80, y: 300, velocity: 0 }; 
-                pipes = []; 
-                frameCount = 0; 
-                currentScore = 0; 
-                gameRunning = true;
-                wingAngle = 0;
-            }
-            
-            function jump() { 
-                if (gameRunning) bird.velocity = -5.2; 
-            }
-            
-            function createPipe() { 
-                let minH = 80, maxH = canvas.height - 180, topH = Math.random() * (maxH - minH) + minH; 
-                pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH + 150,
+        }
+        
+        function initGame() { 
+            bird = { x: 80, y: 300, velocity: 0 }; 
+            pipes = []; 
+            frameCount = 0; 
+            currentScore = 0; 
+            gameRunning = true;
+            wingAngle = 0;
+        }
+        
+        function jump() { 
+            if (gameRunning) bird.velocity = -5.2; 
+        }
+        
+        function createPipe() { 
+            let minH = 80, maxH = canvas.height - 180, topH = Math.random() * (maxH - minH) + minH; 
+            pipes.push({ x: canvas.width, topHeight: topH, bottomY: topH + 150, passed: false }); 
+        }
+        
+        function updateGame() {
+            if (!gameRunning) return;
+            wingAngle += 0.18;
+            bird.velocity += 0.22;
+            bird.y += bird.velocity;
+            if (bird.y - 12 < 0 || bird.y + 12 > canvas.height - 60) { gameOver(); return; }
+            frameCount++;
+            if (frameCount > 90) { createPipe(); frameCount = 0; }
+            for (let i = 0; i < pipes.length; i++) {
+                pipes[i].x -= 2.8;
+                if (!pipes[i].passed && pipes[i].x + 55 < bird.x) { pipes[i].passed = true; currentScore++; }
+                if (bird.x + 12 > pipes[i].x && bird.x - 12 < pipes[i].x + 55 && 
+                    (bird.y - 12 < pipes[i].topHeight || bird.y + 12 > pipes[i].bottomY)) { gameOver(); return; }
+                if (pipes[i].x + 55 < 0) { pipes.splice(i, 1);
