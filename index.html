@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>BASED-FLAPPY | Play & Earn on Base</title>
+    <title>BASED-FLAPPY | Total Score Contest</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #0A0F1A 0%, #0C1222 100%);
             min-height: 100vh;
             color: #fff;
         }
-
         .navbar {
             position: fixed;
             top: 0;
@@ -29,7 +23,6 @@
             z-index: 100;
             padding: 12px 24px;
         }
-
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -37,7 +30,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 24px;
             font-weight: 800;
@@ -45,12 +37,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-        }
-
+        .nav-links { display: flex; gap: 32px; }
         .nav-links a {
             color: #8B8B9E;
             text-decoration: none;
@@ -58,11 +45,7 @@
             font-size: 14px;
             cursor: pointer;
         }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: #3B82F6;
-        }
-
+        .nav-links a:hover, .nav-links a.active { color: #3B82F6; }
         .wallet-badge {
             background: rgba(59,130,246,0.2);
             padding: 8px 16px;
@@ -72,41 +55,21 @@
             cursor: pointer;
             border: 1px solid rgba(59,130,246,0.3);
         }
-
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 24px 40px;
-        }
-
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 100px 24px 40px; }
+        .game-container { display: flex; flex-direction: column; align-items: center; }
         .game-wrapper {
             background: linear-gradient(135deg, #1A1F2E, #0F1425);
             border-radius: 32px;
             padding: 20px;
             margin-bottom: 24px;
         }
-
         canvas {
             border-radius: 24px;
             display: block;
             margin: 0 auto;
             background: #0F172A;
         }
-
-        .game-controls {
-            display: flex;
-            gap: 16px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        .game-controls { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
         .btn-primary {
             background: linear-gradient(135deg, #3B82F6, #2563EB);
             border: none;
@@ -117,7 +80,6 @@
             color: white;
             cursor: pointer;
         }
-
         .btn-secondary {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -128,7 +90,6 @@
             color: white;
             cursor: pointer;
         }
-
         .entry-fee-badge {
             background: rgba(59,130,246,0.2);
             border: 1px solid rgba(59,130,246,0.3);
@@ -138,14 +99,7 @@
             color: #3B82F6;
             margin-bottom: 16px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 48px;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
         .stat-card {
             background: rgba(15, 20, 35, 0.6);
             backdrop-filter: blur(10px);
@@ -153,19 +107,8 @@
             padding: 24px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .stat-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #3B82F6;
-        }
-
-        .leaderboard-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
+        .stat-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #3B82F6; }
+        .leaderboard-list { max-height: 400px; overflow-y: auto; }
         .leaderboard-item {
             display: flex;
             align-items: center;
@@ -173,23 +116,11 @@
             padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        .leaderboard-rank {
-            width: 45px;
-            font-weight: 700;
-        }
-
+        .leaderboard-rank { width: 45px; font-weight: 700; }
         .rank-1 { color: #FFD700; }
         .rank-2 { color: #C0C0C0; }
         .rank-3 { color: #CD7F32; }
-
-        .leaderboard-player {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .leaderboard-player { flex: 1; display: flex; align-items: center; gap: 12px; }
         .player-avatar {
             width: 36px;
             height: 36px;
@@ -200,53 +131,9 @@
             justify-content: center;
             font-weight: 600;
         }
-
-        .leaderboard-score {
-            font-weight: 700;
-            color: #3B82F6;
-            font-size: 18px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* POPUP - SIMPLE WORKING VERSION */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup-box {
-            background: linear-gradient(135deg, #1A1F2E, #0F1425);
-            border-radius: 32px;
-            padding: 32px;
-            max-width: 450px;
-            width: 90%;
-            border: 2px solid rgba(59,130,246,0.6);
-        }
-
-        .popup-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #3B82F6, #2563EB);
-            border: none;
-            padding: 14px;
-            border-radius: 40px;
-            font-size: 18px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-
+        .leaderboard-score { font-weight: 700; color: #3B82F6; font-size: 18px; }
+        .games-played { font-size: 11px; color: #8B8B9E; margin-left: 8px; }
+        .hidden { display: none !important; }
         .reminder-btn {
             position: fixed;
             bottom: 20px;
@@ -262,7 +149,6 @@
             font-size: 28px;
             z-index: 99;
         }
-
         .gameover-modal {
             position: fixed;
             top: 0;
@@ -275,7 +161,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .gameover-card {
             background: linear-gradient(135deg, #1A1F2E, #0F1425);
             border-radius: 48px;
@@ -284,7 +169,6 @@
             max-width: 400px;
             width: 90%;
         }
-
         .score-stats {
             display: flex;
             justify-content: center;
@@ -294,18 +178,8 @@
             background: rgba(255,255,255,0.05);
             border-radius: 32px;
         }
-
-        .docs-content {
-            line-height: 1.8;
-            color: #CBD5E1;
-            font-size: 15px;
-        }
-
-        .docs-content h4 {
-            color: #3B82F6;
-            margin: 20px 0 10px 0;
-        }
-
+        .docs-content { line-height: 1.8; color: #CBD5E1; font-size: 15px; }
+        .docs-content h4 { color: #3B82F6; margin: 20px 0 10px 0; }
         .support-links {
             background: rgba(59,130,246,0.1);
             border-radius: 16px;
@@ -313,12 +187,6 @@
             margin-top: 20px;
             text-align: center;
         }
-
-        .support-links a {
-            color: #3B82F6;
-            text-decoration: none;
-        }
-
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
@@ -359,7 +227,7 @@
         <div id="leaderboardTab" class="hidden">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>🏆 TOP SCORERS</h3>
+                    <h3>🏆 TOP SCORERS (TOTAL SCORE)</h3>
                     <div id="leaderboardList" class="leaderboard-list">Loading...</div>
                 </div>
                 <div class="stat-card">
@@ -374,20 +242,13 @@
                 <h3>📚 BASED-FLAPPY DOCUMENTATION</h3>
                 <div class="docs-content">
                     <h4>🎮 Game Overview</h4>
-                    <p>BASED-FLAPPY is an exciting Web3 competitive gaming experience built on the Base blockchain. Players compete weekly to achieve the highest score in this classic Flappy Bird-style game, with real ETH prizes awarded to top performers.</p>
-                    
+                    <p>BASED-FLAPPY is an exciting Web3 competitive gaming experience built on the Base blockchain. Players compete weekly to achieve the highest TOTAL SCORE across multiple games. The more you play, the higher your total score!</p>
                     <h4>⚙️ How It Works</h4>
-                    <p>Each weekly contest runs from Monday to Sunday. Players pay an entry fee of 0.00005 ETH, which contributes to the prize pool. Distribution: 50% to 1st place, 40% to 2nd place, 10% protocol fees. Scores are tracked transparently on-chain.</p>
-                    
+                    <p>Each weekly contest runs from Monday to Sunday. Players pay an entry fee of 0.00005 ETH. Your TOTAL SCORE = sum of all game scores you achieve during the week.</p>
                     <h4>🎯 Gameplay Mechanics</h4>
-                    <p>Tap or press SPACE to fly. Each pipe passed = 1 point. Game ends on collision. Your highest score determines ranking.</p>
-                    
-                    <h4>🔐 Security & Fairness</h4>
-                    <p>All scores are immutable once submitted. Leaderboard updates in real-time. No centralized entity can alter results.</p>
-                    
-                    <h4>🚀 Future Updates</h4>
-                    <p>NFT bird skins, referral bonuses, daily tournaments, and expanded prize pools coming soon.</p>
-                    
+                    <p>Tap or press SPACE to fly. Each pipe passed = 1 point. Play multiple times to increase your total!</p>
+                    <h4>🏆 Why Total Score?</h4>
+                    <p>Total Score rewards consistent players! It's not just about one lucky game — it's about dedication and skill over time.</p>
                     <div class="support-links">
                         <h4>📞 Support & Community</h4>
                         <p>📱 Telegram: <a href="https://t.me/gojo0204hm" target="_blank">@gojo0204hm</a></p>
@@ -400,12 +261,11 @@
 
     <div class="reminder-btn" id="reminderBtn">🏆</div>
 
-    <!-- SIMPLE POPUP - BUTTON WILL WORK -->
     <div id="popup" class="popup">
         <div class="popup-box">
             <div style="text-align: center;">
                 <div style="font-size: 64px;">🐦💰</div>
-                <div style="font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #3B82F6, #60A5FA); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">WEEKLY CONTEST</div>
+                <div style="font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #3B82F6, #60A5FA); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TOTAL SCORE CONTEST</div>
             </div>
             <div style="background: rgba(59,130,246,0.15); border-radius: 24px; padding: 20px; margin: 20px 0; text-align: center;">
                 <div style="font-size: 14px; color: #8B8B9E;">🏆 CURRENT PRIZE POOL 🏆</div>
@@ -420,7 +280,8 @@
             <ul style="margin: 20px 0; padding-left: 20px;">
                 <li style="margin: 12px 0;">🎮 <strong>Entry Fee:</strong> 0.00005 ETH per player</li>
                 <li style="margin: 12px 0;">📅 <strong>Weekly Contest:</strong> Monday to Sunday</li>
-                <li style="margin: 12px 0;">🏅 <strong>Top 2 Winners</strong> take the prize pool!</li>
+                <li style="margin: 12px 0;">🏅 <strong>Top 2 Winners</strong> by TOTAL SCORE!</li>
+                <li style="margin: 12px 0;">🔄 <strong>Play multiple times</strong> — every game adds to your total!</li>
                 <li style="margin: 12px 0;">💎 <strong>Connect Wallet → Pay Entry → Play → Win!</strong></li>
             </ul>
             <button id="closePopupBtn" class="popup-btn">🎮 START PLAYING →</button>
@@ -430,8 +291,8 @@
     <div id="gameoverModal" class="gameover-modal hidden">
         <div class="gameover-card">
             <div class="score-stats">
-                <div class="score-stat"><div>SCORE</div><div style="font-size: 32px; color:#3B82F6;" id="finalScore">0</div></div>
-                <div class="score-stat"><div>BEST</div><div style="font-size: 32px; color:#3B82F6;" id="bestScore">0</div></div>
+                <div class="score-stat"><div>THIS GAME</div><div style="font-size: 32px; color:#3B82F6;" id="finalScore">0</div></div>
+                <div class="score-stat"><div>YOUR TOTAL</div><div style="font-size: 32px; color:#FFD966;" id="totalScoreDisplay">0</div></div>
             </div>
             <button class="btn-primary" id="restartBtn">PLAY AGAIN</button>
             <button class="btn-secondary" id="closeModalBtn" style="margin-top: 10px;">CLOSE</button>
@@ -440,65 +301,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ========== POPUP - DIRECT WORKING CODE ==========
-        (function() {
-            const popup = document.getElementById('popup');
-            const closeBtn = document.getElementById('closePopupBtn');
-            const reminder = document.getElementById('reminderBtn');
-            
-            console.log("Popup script loaded");
-            
-            // Check if popup was shown before
-            if (localStorage.getItem('popupDone') === 'yes') {
-                popup.style.display = 'none';
-                console.log("Popup hidden because already shown");
-            }
-            
-            // CLOSE BUTTON - DIRECT CLICK HANDLER
-            if (closeBtn) {
-                closeBtn.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log("START PLAYING button clicked!");
-                    popup.style.display = 'none';
-                    localStorage.setItem('popupDone', 'yes');
-                    return false;
-                };
-                
-                // Also add another event listener for safety
-                closeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log("Button clicked via addEventListener");
-                    popup.style.display = 'none';
-                    localStorage.setItem('popupDone', 'yes');
-                });
-            }
-            
-            // Reminder button
-            if (reminder) {
-                reminder.onclick = function() {
-                    console.log("Reminder clicked");
-                    popup.style.display = 'flex';
-                };
-            }
-            
-            // Click outside to close
-            if (popup) {
-                popup.onclick = function(e) {
-                    if (e.target === popup) {
-                        console.log("Clicked outside");
-                        popup.style.display = 'none';
-                        localStorage.setItem('popupDone', 'yes');
-                    }
-                };
-            }
-        })();
+        // Supabase Config
+        const supabaseClient = supabase.createClient(
+            'https://bsmuxnnjclhcuecpybkp.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y'
+        );
         
-        // Game Variables
         let userAddress = null;
         let hasEntered = false;
         let currentScore = 0;
+        let totalScore = 0;
         let gameRunning = false;
         let bird = { x: 80, y: 300, velocity: 0 };
         let pipes = [];
@@ -506,15 +318,10 @@
         let wingAngle = 0;
         let cloudOffset = 0;
         let buildingOffset = 0;
+        let gameLoopId = null;
         
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
-        // Supabase
-        const supabaseClient = supabase.createClient(
-            'https://bsmuxnnjclhcuecpybkp.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y'
-        );
         
         function getWeekNumber() {
             const now = new Date();
@@ -523,9 +330,19 @@
             return Math.ceil(days / 7);
         }
         
+        async function loadTotalScore() {
+            if (!userAddress) return;
+            const week = getWeekNumber();
+            const { data } = await supabaseClient.from('scores').select('total_score, games_played').eq('wallet_address', userAddress).eq('week_number', week).single();
+            if (data) {
+                totalScore = data.total_score || 0;
+                document.getElementById('totalScoreDisplay').innerHTML = totalScore;
+            }
+        }
+        
         async function loadLeaderboard() {
             const week = getWeekNumber();
-            const { data } = await supabaseClient.from('scores').select('wallet_address, username, score').eq('week_number', week).order('score', { ascending: false }).limit(20);
+            const { data } = await supabaseClient.from('scores').select('wallet_address, username, total_score, games_played').eq('week_number', week).order('total_score', { ascending: false }).limit(20);
             const listDiv = document.getElementById('leaderboardList');
             if (!data || data.length === 0) {
                 listDiv.innerHTML = '<div style="text-align:center;padding:20px;">✨ No players yet</div>';
@@ -534,7 +351,7 @@
             listDiv.innerHTML = data.map((s, i) => {
                 let rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
                 let name = s.username || s.wallet_address.slice(0,8);
-                return `<div class="leaderboard-item"><div class="leaderboard-rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${rank}</div><div class="leaderboard-player"><div class="player-avatar">${name.charAt(0)}</div><span>${name}</span></div><div class="leaderboard-score">${s.score}</div></div>`;
+                return `<div class="leaderboard-item"><div class="leaderboard-rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${rank}</div><div class="leaderboard-player"><div class="player-avatar">${name.charAt(0)}</div><span>${name}</span><span class="games-played">(${s.games_played || 0} games)</span></div><div class="leaderboard-score">${s.total_score || 0}</div></div>`;
             }).join('');
             const totalPool = (data.length) * 0.00005;
             document.getElementById('prizePoolDisplay').innerText = totalPool.toFixed(6);
@@ -549,20 +366,39 @@
                 winnersDiv.innerHTML = '<div style="text-align:center;padding:20px;">🏆 No winners yet</div>';
                 return;
             }
-            winnersDiv.innerHTML = data.map(w => `<div class="winner-item" style="padding:12px;background:rgba(59,130,246,0.1);border-radius:16px;margin-bottom:10px;">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>`).join('');
+            winnersDiv.innerHTML = data.map(w => `<div style="padding:12px;background:rgba(59,130,246,0.1);border-radius:16px;margin-bottom:10px;">🏆 Week ${w.week_number}<br>🥇 ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>`).join('');
         }
         
         async function submitScore(score) {
             if (!userAddress || !hasEntered || score === 0) return;
             const week = getWeekNumber();
             const username = userAddress.slice(0,8);
-            const { data: existing } = await supabaseClient.from('scores').select('score').eq('wallet_address', userAddress).eq('week_number', week).single();
-            if (existing && score <= existing.score) return;
+            
+            const { data: existing } = await supabaseClient.from('scores').select('total_score, games_played').eq('wallet_address', userAddress).eq('week_number', week).single();
+            
             if (existing) {
-                await supabaseClient.from('scores').update({ score, username }).eq('wallet_address', userAddress).eq('week_number', week);
+                const newTotal = existing.total_score + score;
+                const newGames = (existing.games_played || 0) + 1;
+                await supabaseClient.from('scores').update({ 
+                    total_score: newTotal, 
+                    games_played: newGames,
+                    username: username,
+                    score: Math.max(existing.total_score, score)
+                }).eq('wallet_address', userAddress).eq('week_number', week);
+                totalScore = newTotal;
             } else {
-                await supabaseClient.from('scores').insert({ wallet_address: userAddress, username, score, week_number: week });
+                await supabaseClient.from('scores').insert({ 
+                    wallet_address: userAddress, 
+                    username: username, 
+                    total_score: score,
+                    games_played: 1,
+                    score: score,
+                    week_number: week 
+                });
+                totalScore = score;
             }
+            
+            document.getElementById('totalScoreDisplay').innerHTML = totalScore;
             loadLeaderboard();
         }
         
@@ -577,6 +413,7 @@
                 userAddress = accounts[0];
                 document.getElementById('walletBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
                 document.getElementById('walletStatus').innerHTML = '✅ Wallet connected!';
+                await loadTotalScore();
                 loadLeaderboard();
                 loadWinners();
             } catch(e) {
@@ -596,10 +433,10 @@
             hasEntered = true;
             document.getElementById('entryBtn').disabled = true;
             document.getElementById('entryBtn').innerHTML = '✅ ENTERED!';
-            document.getElementById('walletStatus').innerHTML = '✅ You can now play! Click START GAME';
+            document.getElementById('walletStatus').innerHTML = '✅ Each game adds to your TOTAL SCORE!';
         }
         
-        // Drawing with Buildings and Clouds
+        // Drawing functions (same as before)
         function drawBackground() {
             const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             grad.addColorStop(0, '#0A0F1A');
@@ -608,7 +445,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Clouds
             cloudOffset = (cloudOffset + 0.3) % (canvas.width + 200);
             ctx.fillStyle = 'rgba(255,255,255,0.7)';
             for(let i = 0; i < 4; i++) {
@@ -620,7 +456,6 @@
                 ctx.fill();
             }
             
-            // Buildings
             buildingOffset = (buildingOffset + 0.5) % 300;
             for(let i = 0; i < 12; i++) {
                 let buildingX = (i * 45 - buildingOffset) % (canvas.width + 150) - 50;
@@ -633,7 +468,6 @@
                 }
             }
             
-            // Ground
             ctx.fillStyle = '#2D3E50';
             ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
             ctx.fillStyle = '#3B5249';
@@ -688,6 +522,9 @@
             ctx.font = 'bold 36px Arial';
             ctx.fillStyle = '#FFFFFF';
             ctx.fillText(currentScore, canvas.width/2 - 15, 60);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#8B8B9E';
+            ctx.fillText('TOTAL: ' + totalScore, canvas.width - 80, 30);
         }
         
         function initGame() {
@@ -699,9 +536,7 @@
             wingAngle = 0;
         }
         
-        function jump() {
-            if (gameRunning) bird.velocity = -5.2;
-        }
+        function jump() { if (gameRunning) bird.velocity = -5.2; }
         
         function createPipe() {
             let minH = 80, maxH = canvas.height - 180, topH = Math.random() * (maxH - minH) + minH;
@@ -740,7 +575,7 @@
             drawPipes();
             drawBird();
             drawScore();
-            requestAnimationFrame(gameLoop);
+            gameLoopId = requestAnimationFrame(gameLoop);
         }
         
         function gameOver() {
@@ -748,12 +583,6 @@
             gameRunning = false;
             submitScore(currentScore);
             document.getElementById('finalScore').innerHTML = currentScore;
-            let best = localStorage.getItem('bestScore') || 0;
-            if (currentScore > best) {
-                best = currentScore;
-                localStorage.setItem('bestScore', currentScore);
-            }
-            document.getElementById('bestScore').innerHTML = best;
             document.getElementById('gameoverModal').classList.remove('hidden');
         }
         
@@ -765,6 +594,39 @@
             initGame();
             document.getElementById('gameoverModal').classList.add('hidden');
         }
+        
+        // Popup
+        (function() {
+            const popup = document.getElementById('popup');
+            const closeBtn = document.getElementById('closePopupBtn');
+            const reminder = document.getElementById('reminderBtn');
+            
+            if (localStorage.getItem('popupDone') === 'yes') {
+                popup.style.display = 'none';
+            }
+            
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    popup.style.display = 'none';
+                    localStorage.setItem('popupDone', 'yes');
+                };
+            }
+            
+            if (reminder) {
+                reminder.onclick = () => {
+                    popup.style.display = 'flex';
+                };
+            }
+            
+            if (popup) {
+                popup.onclick = (e) => {
+                    if (e.target === popup) {
+                        popup.style.display = 'none';
+                        localStorage.setItem('popupDone', 'yes');
+                    }
+                };
+            }
+        })();
         
         // Event Listeners
         document.getElementById('playBtn').addEventListener('click', startGame);
