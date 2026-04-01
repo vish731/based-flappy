@@ -92,7 +92,7 @@
             box-shadow: 0 0 20px var(--primary-glow);
         }
         
-        .logo-icon svg { width: 17px; height: 17px; }
+        .logo-icon svg { width: 20px; height: 20px; }
         
         .logo-text {
             background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
@@ -516,8 +516,22 @@
         <div class="nav-container">
             <div class="logo">
                 <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M4 9.5C4 9.5 4.5 7 7 5.5C9.5 4 12 4.5 14 6C16 7.5 17 8 18 8C19 8 20 7.5 20 7.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <ellipse cx="13" cy="11" rx="7" ry="5.5" fill="white" opacity="0.9"/>
+                        <ellipse cx="13" cy="11" rx="7" ry="5.5" fill="url(#birdGrad)" opacity="0.85"/>
+                        <circle cx="16" cy="9.5" r="2" fill="white"/>
+                        <circle cx="16.8" cy="9.2" r="1.1" fill="#0F172A"/>
+                        <circle cx="17.2" cy="8.7" r="0.4" fill="white"/>
+                        <path d="M19.5 11L22 10.5L19.5 12Z" fill="#F59E0B"/>
+                        <path d="M6 11C4.5 12 3.5 14 4 16C4.5 18 6.5 17.5 7 16C7.5 14.5 6.5 12 6 11Z" fill="white" opacity="0.8"/>
+                        <defs>
+                            <linearGradient id="birdGrad" x1="6" y1="5.5" x2="20" y2="16.5">
+                                <stop offset="0%" stop-color="#60A5FA"/>
+                                <stop offset="50%" stop-color="#3B82F6"/>
+                                <stop offset="100%" stop-color="#2563EB"/>
+                            </linearGradient>
+                        </defs>
                     </svg>
                 </div>
                 <span class="logo-text">BASED-FLAPPY</span>
@@ -624,7 +638,6 @@
     <button class="reminder-btn" id="reminderBtn">?</button>
     <div class="sound-indicator" id="soundIndicator">Sound ON</div>
 
-    <!-- ONBOARDING -->
     <div id="onboardingOverlay" class="onboarding-overlay active">
         <div class="onboarding-scroll-wrapper">
             <div class="onboarding-card">
@@ -686,7 +699,6 @@
         </div>
     </div>
 
-    <!-- GAME OVER -->
     <div id="gameoverModal" class="gameover-modal">
         <div class="gameover-card">
             <div class="gameover-title">GAME OVER</div>
@@ -704,21 +716,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ==================== SOUND ====================
         const SoundEngine = {
             ctx: null, enabled: true, masterVolume: 0.3,
-            init() { 
-                try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } 
-                catch(e) { console.warn('AudioContext not available'); } 
-            },
-            ensureContext() { 
-                if (!this.ctx) this.init(); 
-                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); 
-            },
+            init() { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} },
+            ensureContext() { if (!this.ctx) this.init(); if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
             play(type) {
-                if (!this.enabled) return; 
-                this.ensureContext();
-                if (!this.ctx) return;
+                if (!this.enabled) return; this.ensureContext(); if (!this.ctx) return;
                 switch(type) {
                     case 'flap': this._osc(400,'sine',0.1,0.25,600,0.08); break;
                     case 'score': this._osc(880,'sine',0.15,0.2); setTimeout(()=>this._osc(1100,'sine',0.2,0.2),80); break;
@@ -731,33 +734,27 @@
                 if(!this.ctx) return;
                 try {
                     const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-                    o.type=t;
-                    o.frequency.setValueAtTime(f,this.ctx.currentTime);
+                    o.type=t; o.frequency.setValueAtTime(f,this.ctx.currentTime);
                     if(ef) o.frequency.exponentialRampToValueAtTime(ef,this.ctx.currentTime+(ed||d));
                     g.gain.setValueAtTime(v*this.masterVolume,this.ctx.currentTime);
                     g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+d);
-                    o.connect(g); g.connect(this.ctx.destination);
-                    o.start(); o.stop(this.ctx.currentTime+d);
+                    o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(this.ctx.currentTime+d);
                 } catch(e) {}
             },
             toggle(){ this.enabled=!this.enabled; return this.enabled; }
         };
         
-        // ==================== THEME ====================
         const ThemeManager = {
             current: localStorage.getItem('theme') || 'dark',
             init() { this.apply(this.current); },
-            apply(t) { 
-                this.current=t; 
-                document.documentElement.setAttribute('data-theme',t); 
-                localStorage.setItem('theme',t); 
-                document.getElementById('moonIcon').style.display=t==='dark'?'block':'none'; 
-                document.getElementById('sunIcon').style.display=t==='light'?'block':'none'; 
+            apply(t) {
+                this.current=t; document.documentElement.setAttribute('data-theme',t); localStorage.setItem('theme',t);
+                document.getElementById('moonIcon').style.display=t==='dark'?'block':'none';
+                document.getElementById('sunIcon').style.display=t==='light'?'block':'none';
             },
             toggle() { this.apply(this.current==='dark'?'light':'dark'); SoundEngine.play('click'); }
         };
         
-        // ==================== MOBILE ====================
         const MobileHelper = {
             isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
             isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
@@ -769,12 +766,10 @@
             installMetaMask() { window.open(this.getInstallLink(), '_blank'); }
         };
         
-        // ==================== CONTEST TIMER ====================
         const ContestTimer = {
             init() { this.update(); setInterval(() => this.update(), 1000); },
             getNextSundayMidnight() {
-                const now = new Date();
-                const dayOfWeek = now.getDay();
+                const now = new Date(), dayOfWeek = now.getDay();
                 const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
                 const nextSunday = new Date(now);
                 nextSunday.setDate(now.getDate() + daysUntilSunday);
@@ -782,42 +777,33 @@
                 return nextSunday;
             },
             update() {
-                const target = this.getNextSundayMidnight();
-                const now = new Date();
+                const target = this.getNextSundayMidnight(), now = new Date();
                 let diff = target - now;
-                if (diff < 1000) {
-                    const nextWeek = new Date(target);
-                    nextWeek.setDate(nextWeek.getDate() + 7);
-                    diff = nextWeek - now;
-                }
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                if (diff < 1000) { const nw = new Date(target); nw.setDate(nw.getDate() + 7); diff = nw - now; }
+                const days = Math.floor(diff / (1000*60*60*24));
+                const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+                const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
                 document.getElementById('timerDays').textContent = days + 'd';
                 document.getElementById('timerHours').textContent = String(hours).padStart(2, '0') + 'h';
                 document.getElementById('timerMins').textContent = String(mins).padStart(2, '0') + 'm';
             }
         };
         
-        // ==================== CONFIG ====================
+        // Gravity reduced from 0.25 to 0.17 for slower falling
         const CONFIG = { 
-            gravity: 0.25, jumpForce: -5.5, pipeSpeed: 3, 
+            gravity: 0.17, jumpForce: -5.2, pipeSpeed: 3, 
             pipeGap: 160, pipeWidth: 60, pipeSpawnRate: 85, 
             birdSize: 14, trailLength: 8 
         };
         
-        // ==================== SUPABASE ====================
         let supabaseClient = null;
         try {
             supabaseClient = supabase.createClient(
                 'https://bsmuxnnjclhcuecpybkp.supabase.co',
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbXV4bm5qY2xoY3VlY3B5YmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTQ2NzMsImV4cCI6MjA5MDA5MDY3M30.zot2f5yv6m61vgt3avydYPk87zDy0MbUecYku29oI0Y'
             );
-        } catch(e) {
-            console.warn('Supabase init failed:', e);
-        }
+        } catch(e) { console.warn('Supabase init failed:', e); }
         
-        // ==================== STATE ====================
         let userAddress = null, hasEntered = false, currentScore = 0, totalScore = 0;
         let gameRunning = false, gameStarted = false;
         let bird = { x: 80, y: 300, velocity: 0, rotation: 0 };
@@ -827,65 +813,34 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        function getWeekNumber() { 
-            const n = new Date(), s = new Date(n.getFullYear(), 0, 1); 
-            return Math.ceil(Math.floor((n - s) / 864e5) / 7); 
-        }
+        function getWeekNumber() { const n = new Date(), s = new Date(n.getFullYear(), 0, 1); return Math.ceil(Math.floor((n - s) / 864e5) / 7); }
         function lerp(a, b, t) { return a + (b - a) * t; }
+        function rr(min, max) { return Math.random() * (max - min) + min; }
         
-        // ========== FIX #1: rr() function - 2 params, not 3 ==========
-        function rr(min, max) { 
-            return Math.random() * (max - min) + min; 
-        }
-        
-        // ==================== PARTICLES ====================
         class Particle {
             constructor(x, y, c, t = 'trail') {
                 this.x = x; this.y = y; this.c = c; this.t = t; this.l = 1;
-                if (t === 'trail') { 
-                    this.s = rr(2, 5); this.d = rr(0.02, 0.05); 
-                    this.vx = rr(-1, -0.5); this.vy = rr(-0.5, 0.5); 
-                } else if (t === 'explosion') { 
-                    this.s = rr(3, 8); this.d = rr(0.02, 0.04); 
-                    const a = rr(0, Math.PI * 2), sp = rr(2, 8); 
-                    this.vx = Math.cos(a) * sp; this.vy = Math.sin(a) * sp; 
-                } else { 
-                    this.s = rr(4, 8); this.d = rr(0.015, 0.03); 
-                    this.vx = rr(-2, 2); this.vy = rr(-3, -1); 
-                }
+                if (t === 'trail') { this.s = rr(2, 5); this.d = rr(0.02, 0.05); this.vx = rr(-1, -0.5); this.vy = rr(-0.5, 0.5); }
+                else if (t === 'explosion') { this.s = rr(3, 8); this.d = rr(0.02, 0.04); const a = rr(0, Math.PI*2), sp = rr(2, 8); this.vx = Math.cos(a)*sp; this.vy = Math.sin(a)*sp; }
+                else { this.s = rr(4, 8); this.d = rr(0.015, 0.03); this.vx = rr(-2, 2); this.vy = rr(-3, -1); }
             }
-            update() { 
-                this.l -= this.d; this.x += this.vx; this.y += this.vy; this.s *= 0.98; 
-                if (this.t === 'explosion') { this.vx *= 0.95; this.vy *= 0.95; } 
-                return this.l > 0; 
-            }
-            draw(ctx) { 
-                ctx.save(); ctx.globalAlpha = this.l; ctx.fillStyle = this.c; 
-                ctx.shadowColor = this.c; ctx.shadowBlur = this.s * 2; 
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2); ctx.fill(); 
-                ctx.restore(); 
-            }
+            update() { this.l -= this.d; this.x += this.vx; this.y += this.vy; this.s *= 0.98; if (this.t === 'explosion') { this.vx *= 0.95; this.vy *= 0.95; } return this.l > 0; }
+            draw(ctx) { ctx.save(); ctx.globalAlpha = this.l; ctx.fillStyle = this.c; ctx.shadowColor = this.c; ctx.shadowBlur = this.s*2; ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI*2); ctx.fill(); ctx.restore(); }
         }
         
         class ScorePopup {
             constructor(x, y, t, c = '#FFD700') { this.x = x; this.y = y; this.text = t; this.c = c; this.l = 1; this.vy = -2; }
             update() { this.l -= 0.02; this.y += this.vy; this.vy *= 0.95; return this.l > 0; }
-            draw(ctx) { 
-                ctx.save(); ctx.globalAlpha = this.l; ctx.fillStyle = this.c; 
-                ctx.font = 'bold 24px Orbitron,sans-serif'; ctx.textAlign = 'center'; 
-                ctx.shadowColor = this.c; ctx.shadowBlur = 10; 
-                ctx.fillText(this.text, this.x, this.y); ctx.restore(); 
-            }
+            draw(ctx) { ctx.save(); ctx.globalAlpha = this.l; ctx.fillStyle = this.c; ctx.font = 'bold 24px Orbitron,sans-serif'; ctx.textAlign = 'center'; ctx.shadowColor = this.c; ctx.shadowBlur = 10; ctx.fillText(this.text, this.x, this.y); ctx.restore(); }
         }
         
-        // ==================== DRAWING ====================
         function getTC() {
             const d = ThemeManager.current === 'dark';
-            return { 
+            return {
                 s1:d?'#060A13':'#1E3A5F', s2:d?'#0A1628':'#2563EB', s3:d?'#0F1D32':'#60A5FA', s4:d?'#162033':'#93C5FD',
                 sa:d?0.6:0, ca:d?0.03:0.15, bd:d?'#1A2332':'#334155', wo:d?'rgba(251,191,36,0.6)':'rgba(251,191,36,0.8)',
                 wf:d?'rgba(255,255,255,0.05)':'rgba(255,255,255,0.3)', g1:d?'#1E3A2F':'#166534', g2:d?'#0F261D':'#14532D',
-                gd:d?'#2D5A47':'#22C55E', mc:d?'#E2E8F0':'#FDE68A', ms:d?'#060A13':'#2563EB' 
+                gd:d?'#2D5A47':'#22C55E', mc:d?'#E2E8F0':'#FDE68A', ms:d?'#060A13':'#2563EB'
             };
         }
         
@@ -894,43 +849,36 @@
             const g = ctx.createLinearGradient(0,0,0,canvas.height);
             g.addColorStop(0,c.s1); g.addColorStop(0.4,c.s2); g.addColorStop(0.7,c.s3); g.addColorStop(1,c.s4);
             ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
-            // Stars (dark mode)
-            if (c.sa > 0) { 
-                starOffset=(starOffset+0.1)%100; 
-                ctx.fillStyle='#FFF'; 
+            if (c.sa > 0) {
+                starOffset=(starOffset+0.1)%100; ctx.fillStyle='#FFF';
                 for(let i=0;i<50;i++){
-                    const x=(i*73+starOffset)%canvas.width, y=(i*47)%(canvas.height*0.5); 
-                    ctx.globalAlpha=(Math.sin(i*2+frameCount*0.03)+1)*0.3*c.sa/0.6+0.1; 
+                    const x=(i*73+starOffset)%canvas.width, y=(i*47)%(canvas.height*0.5);
+                    ctx.globalAlpha=(Math.sin(i*2+frameCount*0.03)+1)*0.3*c.sa/0.6+0.1;
                     ctx.beginPath(); ctx.arc(x,y,(Math.sin(i+frameCount*0.02)+1)*0.8+0.5,0,Math.PI*2); ctx.fill();
-                } 
-                ctx.globalAlpha=1; 
+                } ctx.globalAlpha=1;
             }
-            // Moon
-            ctx.save(); ctx.fillStyle=c.mc; ctx.shadowColor=c.mc; ctx.shadowBlur=40; 
-            ctx.beginPath(); ctx.arc(320,80,25,0,Math.PI*2); ctx.fill(); 
-            ctx.fillStyle=c.ms; ctx.shadowBlur=0; 
+            ctx.save(); ctx.fillStyle=c.mc; ctx.shadowColor=c.mc; ctx.shadowBlur=40;
+            ctx.beginPath(); ctx.arc(320,80,25,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle=c.ms; ctx.shadowBlur=0;
             ctx.beginPath(); ctx.arc(332,75,22,0,Math.PI*2); ctx.fill(); ctx.restore();
-            // Clouds
-            cloudOffset=(cloudOffset+0.3)%(canvas.width+200); 
+            cloudOffset=(cloudOffset+0.3)%(canvas.width+200);
             for(let i=0;i<4;i++){
-                let cx=(cloudOffset+i*150)%(canvas.width+100)-50, cy=60+i*40; 
-                ctx.fillStyle=ThemeManager.current==='dark'?`rgba(255,255,255,${c.ca+i*0.01})`:`rgba(255,255,255,${c.ca})`; 
+                let cx=(cloudOffset+i*150)%(canvas.width+100)-50, cy=60+i*40;
+                ctx.fillStyle=ThemeManager.current==='dark'?`rgba(255,255,255,${c.ca+i*0.01})`:`rgba(255,255,255,${c.ca})`;
                 ctx.beginPath(); ctx.arc(cx,cy,28,0,Math.PI*2); ctx.arc(cx+32,cy-5,30,0,Math.PI*2); ctx.arc(cx-22,cy-3,25,0,Math.PI*2); ctx.fill();
             }
-            // Buildings
-            buildingOffset=(buildingOffset+0.5)%300; 
+            buildingOffset=(buildingOffset+0.5)%300;
             for(let i=0;i<12;i++){
-                let bx=(i*45-buildingOffset)%(canvas.width+150)-50, bh=45+Math.sin(i*1.5)*25; 
-                ctx.fillStyle=c.bd; ctx.fillRect(bx,canvas.height-75-bh,32,bh); 
+                let bx=(i*45-buildingOffset)%(canvas.width+150)-50, bh=45+Math.sin(i*1.5)*25;
+                ctx.fillStyle=c.bd; ctx.fillRect(bx,canvas.height-75-bh,32,bh);
                 for(let w=0;w<3;w++) for(let h=0;h<Math.floor(bh/18);h++){
-                    ctx.fillStyle=Math.sin(i*3+w*5+h*7+frameCount*0.005)>0.3?c.wo:c.wf; 
+                    ctx.fillStyle=Math.sin(i*3+w*5+h*7+frameCount*0.005)>0.3?c.wo:c.wf;
                     ctx.fillRect(bx+5+w*10,canvas.height-75-bh+8+h*18,6,8);
                 }
             }
-            // Ground
-            const gg=ctx.createLinearGradient(0,canvas.height-60,0,canvas.height); 
-            gg.addColorStop(0,c.g1); gg.addColorStop(1,c.g2); 
-            ctx.fillStyle=gg; ctx.fillRect(0,canvas.height-60,canvas.width,60); 
+            const gg=ctx.createLinearGradient(0,canvas.height-60,0,canvas.height);
+            gg.addColorStop(0,c.g1); gg.addColorStop(1,c.g2);
+            ctx.fillStyle=gg; ctx.fillRect(0,canvas.height-60,canvas.width,60);
             ctx.fillStyle=c.gd; for(let i=0;i<20;i++) ctx.fillRect(i*30,canvas.height-60,15,4);
         }
         
@@ -938,10 +886,10 @@
             ctx.save(); ctx.translate(bird.x, bird.y);
             bird.rotation = lerp(bird.rotation, Math.min(Math.max(bird.velocity*3,-30),70), 0.15);
             ctx.rotate(bird.rotation*Math.PI/180); ctx.shadowColor='#3B82F6'; ctx.shadowBlur=25;
-            const bg=ctx.createRadialGradient(0,0,0,0,0,CONFIG.birdSize); 
+            const bg=ctx.createRadialGradient(0,0,0,0,0,CONFIG.birdSize);
             bg.addColorStop(0,'#60A5FA'); bg.addColorStop(0.5,'#3B82F6'); bg.addColorStop(1,'#2563EB');
             ctx.fillStyle=bg; ctx.beginPath(); ctx.ellipse(0,0,CONFIG.birdSize,CONFIG.birdSize-2,0,0,Math.PI*2); ctx.fill();
-            ctx.shadowBlur=0; ctx.fillStyle='#1D4ED8'; 
+            ctx.shadowBlur=0; ctx.fillStyle='#1D4ED8';
             let w=Math.sin(wingAngle)*12;
             ctx.beginPath(); ctx.moveTo(-5,0); ctx.quadraticCurveTo(-12-w,-10,-18,w*0.5); ctx.quadraticCurveTo(-10,5,-5,3); ctx.fill();
             ctx.fillStyle='#FFF'; ctx.beginPath(); ctx.arc(6,-4,5,0,Math.PI*2); ctx.fill();
@@ -953,17 +901,17 @@
         
         function drawPipes() {
             for(let p of pipes){
-                const pg=ctx.createLinearGradient(p.x,0,p.x+CONFIG.pipeWidth,0); 
+                const pg=ctx.createLinearGradient(p.x,0,p.x+CONFIG.pipeWidth,0);
                 pg.addColorStop(0,'#1E40AF'); pg.addColorStop(0.3,'#3B82F6'); pg.addColorStop(0.7,'#2563EB'); pg.addColorStop(1,'#1E3A8A');
                 ctx.fillStyle=pg; ctx.fillRect(p.x,0,CONFIG.pipeWidth,p.topHeight);
-                const cg=ctx.createLinearGradient(p.x-6,0,p.x+CONFIG.pipeWidth+6,0); 
+                const cg=ctx.createLinearGradient(p.x-6,0,p.x+CONFIG.pipeWidth+6,0);
                 cg.addColorStop(0,'#1E3A8A'); cg.addColorStop(0.3,'#60A5FA'); cg.addColorStop(0.7,'#3B82F6'); cg.addColorStop(1,'#1E3A8A');
                 ctx.fillStyle=cg; rr2(p.x-6,p.topHeight-30,CONFIG.pipeWidth+12,30,6); ctx.fill();
                 ctx.fillStyle=pg; ctx.fillRect(p.x,p.bottomY,CONFIG.pipeWidth,canvas.height-p.bottomY);
                 ctx.fillStyle=cg; rr2(p.x-6,p.bottomY,CONFIG.pipeWidth+12,30,6); ctx.fill();
-                ctx.save(); ctx.shadowColor='#3B82F6'; ctx.shadowBlur=12; 
+                ctx.save(); ctx.shadowColor='#3B82F6'; ctx.shadowBlur=12;
                 ctx.strokeStyle='rgba(59,130,246,0.25)'; ctx.lineWidth=1;
-                ctx.strokeRect(p.x,0,CONFIG.pipeWidth,p.topHeight); 
+                ctx.strokeRect(p.x,0,CONFIG.pipeWidth,p.topHeight);
                 ctx.strokeRect(p.x,p.bottomY,CONFIG.pipeWidth,canvas.height-p.bottomY); ctx.restore();
             }
         }
@@ -975,22 +923,22 @@
         }
         
         function drawScore() {
-            ctx.save(); 
+            ctx.save();
             ctx.fillStyle=ThemeManager.current==='dark'?'rgba(0,0,0,0.3)':'rgba(255,255,255,0.3)';
             rr2(canvas.width/2-40,20,80,55,16); ctx.fill();
-            ctx.font='bold 36px Orbitron,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#FFF'; 
+            ctx.font='bold 36px Orbitron,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#FFF';
             ctx.shadowColor='#3B82F6'; ctx.shadowBlur=10;
-            ctx.fillText(currentScore,canvas.width/2,60); ctx.shadowBlur=0; 
+            ctx.fillText(currentScore,canvas.width/2,60); ctx.shadowBlur=0;
             ctx.font='600 11px Inter,sans-serif';
             ctx.fillStyle=ThemeManager.current==='dark'?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.5)';
             ctx.fillText('TOTAL: '+totalScore,canvas.width/2,72); ctx.restore();
         }
         
         function drawStartScreen() {
-            ctx.save(); 
+            ctx.save();
             ctx.fillStyle=ThemeManager.current==='dark'?'rgba(0,0,0,0.4)':'rgba(0,0,0,0.2)';
             ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.font='bold 32px Orbitron,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#FFF'; 
+            ctx.font='bold 32px Orbitron,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#FFF';
             ctx.shadowColor='#3B82F6'; ctx.shadowBlur=20;
             ctx.fillText('BASED-FLAPPY',canvas.width/2,canvas.height/2-40);
             ctx.shadowBlur=0; ctx.font='500 16px Inter,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.7)';
@@ -1007,12 +955,11 @@
             }
         }
         
-        // ==================== GAME LOGIC ====================
         function initGame(){
-            bird={x:80,y:300,velocity:0,rotation:0}; 
-            pipes=[]; particles=[]; scorePopups=[]; trail=[]; 
-            frameCount=0; currentScore=0; 
-            gameRunning=true; gameStarted=false; // FIX #2: gameStarted stays false
+            bird={x:80,y:300,velocity:0,rotation:0};
+            pipes=[]; particles=[]; scorePopups=[]; trail=[];
+            frameCount=0; currentScore=0;
+            gameRunning=true; gameStarted=false;
             wingAngle=0; screenShake={x:0,y:0,intensity:0}; flashAlpha=0;
         }
         
@@ -1044,9 +991,7 @@
             },800);
         }
         
-        // ========== FIX #2 & #3: Completely rewritten updateGame ==========
         function updateGame(){
-            // Always update visual effects (even when dead)
             particles = particles.filter(p => p.update());
             scorePopups = scorePopups.filter(p => p.update());
             
@@ -1061,55 +1006,40 @@
             
             wingAngle += 0.2;
             
-            // ========== START SCREEN: Bird hovers, no gravity, no pipes ==========
             if(!gameStarted){
-                // Gentle hover animation
                 bird.y = 300 + Math.sin(frameCount * 0.05) * 15;
                 bird.rotation = 0;
-                frameCount++; // For background animations
+                frameCount++;
                 return;
             }
             
-            // ========== GAME IS ACTUALLY PLAYING NOW ==========
             bird.velocity += CONFIG.gravity;
             bird.y += bird.velocity;
             
-            // Trail particles
             trail.push({x:bird.x-10, y:bird.y});
             if(trail.length > CONFIG.trailLength) trail.shift();
             if(frameCount % 3 === 0) particles.push(new Particle(bird.x-12, bird.y+rr(-3,3), `rgba(96,165,250,${rr(0.3,0.6)})`,'trail'));
             
-            // Boundary collision (ceiling + ground)
             if(bird.y - CONFIG.birdSize < 0 || bird.y + CONFIG.birdSize > canvas.height - 60){
                 bird.y = Math.max(CONFIG.birdSize, Math.min(canvas.height-60-CONFIG.birdSize, bird.y));
                 triggerDeath(); return;
             }
             
-            // Pipe spawning (only after game started)
             frameCount++;
             if(frameCount > CONFIG.pipeSpawnRate){ createPipe(); frameCount = 0; }
             
-            // Pipe movement, scoring, and collision
             for(let i = pipes.length-1; i >= 0; i--){
                 pipes[i].x -= CONFIG.pipeSpeed;
-                
-                // Score when pipe passes bird
                 if(!pipes[i].passed && pipes[i].x + CONFIG.pipeWidth < bird.x){
-                    pipes[i].passed = true;
-                    currentScore++;
-                    SoundEngine.play('score');
+                    pipes[i].passed = true; currentScore++; SoundEngine.play('score');
                     scorePopups.push(new ScorePopup(bird.x, bird.y-30, '+1'));
                     for(let j=0;j<8;j++) particles.push(new Particle(bird.x, bird.y, '#FFD700','score'));
                 }
-                
-                // Pipe collision
-                if(bird.x + CONFIG.birdSize - 4 > pipes[i].x && 
-                   bird.x - CONFIG.birdSize + 4 < pipes[i].x + CONFIG.pipeWidth && 
+                if(bird.x + CONFIG.birdSize - 4 > pipes[i].x &&
+                   bird.x - CONFIG.birdSize + 4 < pipes[i].x + CONFIG.pipeWidth &&
                    (bird.y - CONFIG.birdSize + 4 < pipes[i].topHeight || bird.y + CONFIG.birdSize - 4 > pipes[i].bottomY)){
                     triggerDeath(); return;
                 }
-                
-                // Remove off-screen pipes
                 if(pipes[i].x + CONFIG.pipeWidth < -10) pipes.splice(i, 1);
             }
         }
@@ -1119,14 +1049,12 @@
             ctx.save();
             ctx.translate(screenShake.x, screenShake.y);
             drawBackground();
-            
             if(gameRunning || particles.length > 0){
                 drawPipes();
                 for(let p of particles) p.draw(ctx);
                 if(gameRunning) drawBird();
                 for(let p of scorePopups) p.draw(ctx);
             }
-            
             if(gameRunning && gameStarted) drawScore();
             if(!gameStarted && gameRunning) drawStartScreen();
             drawFlash();
@@ -1134,17 +1062,14 @@
             requestAnimationFrame(gameLoop);
         }
         
-        // ==================== DATABASE ====================
         async function loadTotalScore(){
             if(!userAddress || !supabaseClient) return;
             try {
                 const {data} = await supabaseClient.from('scores')
                     .select('total_score,games_played')
-                    .eq('wallet_address',userAddress)
-                    .eq('week_number',getWeekNumber())
-                    .single();
+                    .eq('wallet_address',userAddress).eq('week_number',getWeekNumber()).single();
                 if(data){ totalScore=data.total_score||0; document.getElementById('totalScoreDisplay').textContent=totalScore; }
-            } catch(e) { console.warn('loadTotalScore error:', e); }
+            } catch(e) {}
         }
         
         async function loadLeaderboard(){
@@ -1153,12 +1078,10 @@
                 const {data} = await supabaseClient.from('scores')
                     .select('wallet_address,username,total_score,games_played')
                     .eq('week_number',getWeekNumber())
-                    .order('total_score',{ascending:false})
-                    .limit(20);
+                    .order('total_score',{ascending:false}).limit(20);
                 const d=document.getElementById('leaderboardList');
                 if(!data||data.length===0){
-                    d.innerHTML='<div class="empty-state"><p>No players yet</p></div>';
-                    prizePool=0;
+                    d.innerHTML='<div class="empty-state"><p>No players yet</p></div>'; prizePool=0;
                 } else {
                     prizePool=data.length*0.00005;
                     d.innerHTML=data.map((s,i)=>{
@@ -1177,7 +1100,7 @@
                 }
                 document.getElementById('prizePoolDisplay').textContent=prizePool.toFixed(6);
                 document.getElementById('onboardingPrize').textContent=prizePool.toFixed(6)+' ETH';
-            } catch(e) { console.warn('loadLeaderboard error:', e); }
+            } catch(e) {}
         }
         
         async function loadWinners(){
@@ -1192,7 +1115,7 @@
                     <div style="font-weight:700;margin-bottom:6px;">Week ${w.week_number}</div>
                     <div style="color:var(--gold);font-family:'Orbitron',sans-serif;">1st: ${w.winner1_address?.slice(0,8)}... — ${w.winner1_amount?.toFixed(5)} ETH</div>
                 </div>`).join('');
-            } catch(e) { console.warn('loadWinners error:', e); }
+            } catch(e) {}
         }
         
         async function submitScore(score){
@@ -1201,8 +1124,7 @@
                 const week=getWeekNumber(), username=userAddress.slice(0,8);
                 const {data:ex} = await supabaseClient.from('scores')
                     .select('total_score,games_played')
-                    .eq('wallet_address',userAddress)
-                    .eq('week_number',week).single();
+                    .eq('wallet_address',userAddress).eq('week_number',week).single();
                 if(ex){
                     const nt=ex.total_score+score, ng=(ex.games_played||0)+1;
                     await supabaseClient.from('scores')
@@ -1216,10 +1138,9 @@
                 }
                 document.getElementById('totalScoreDisplay').textContent=totalScore;
                 loadLeaderboard();
-            } catch(e) { console.warn('submitScore error:', e); }
+            } catch(e) {}
         }
         
-        // ==================== ONBOARDING UI ====================
         function updateOnboardingUI(){
             const wb=document.getElementById('onboardingWalletBtn');
             const eb=document.getElementById('onboardingEntryBtn');
@@ -1229,7 +1150,6 @@
             const s2=document.getElementById('step2Num');
             const banner=document.getElementById('mmMobileBanner');
             banner.classList.remove('show');
-            
             if(userAddress){
                 s1.classList.add('done');
                 s1.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -1237,89 +1157,59 @@
                 wb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> CONNECTED — '+userAddress.slice(0,6)+'...'+userAddress.slice(-4);
                 document.getElementById('walletDot').classList.add('connected');
                 document.getElementById('walletText').textContent=userAddress.slice(0,6)+'...'+userAddress.slice(-4);
-                
                 if(hasEntered){
                     s2.classList.add('done');
                     s2.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
                     eb.classList.add('done');
                     eb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ENTERED — READY TO PLAY';
-                    sb.disabled=false;
-                    st.className='onboarding-status ready';
-                    st.textContent='All set! Click START GAME.';
-                    const me=document.getElementById('entryBtn');
-                    me.classList.add('btn-entered'); me.innerHTML='ENTERED'; me.style.pointerEvents='none';
+                    sb.disabled=false; st.className='onboarding-status ready'; st.textContent='All set! Click START GAME.';
+                    const me=document.getElementById('entryBtn'); me.classList.add('btn-entered'); me.innerHTML='ENTERED'; me.style.pointerEvents='none';
                     document.getElementById('walletStatus').textContent='Ready to play!';
-                } else {
-                    eb.disabled=false;
-                    st.className='onboarding-status';
-                    st.textContent='Wallet connected. Pay entry fee.';
-                }
+                } else { eb.disabled=false; st.className='onboarding-status'; st.textContent='Wallet connected. Pay entry fee.' }
             } else {
-                wb.disabled=false;
-                st.className='onboarding-status';
-                st.textContent='Complete steps above to start';
+                wb.disabled=false; st.className='onboarding-status'; st.textContent='Complete steps above to start';
                 if(MobileHelper.isMobile && !MobileHelper.hasMetaMaskExtension()) banner.classList.add('show');
             }
         }
         
-        // ==================== WALLET ====================
         async function connectWallet(){
             if(typeof window.ethereum==='undefined'){
-                if(MobileHelper.isMobile){
-                    document.getElementById('mmMobileBanner').classList.add('show');
-                    SoundEngine.play('click'); return;
-                }
-                alert('Please install MetaMask!');
-                window.open('https://metamask.io/download/','_blank'); return;
+                if(MobileHelper.isMobile){ document.getElementById('mmMobileBanner').classList.add('show'); SoundEngine.play('click'); return; }
+                alert('Please install MetaMask!'); window.open('https://metamask.io/download/','_blank'); return;
             }
             const btn=document.getElementById('onboardingWalletBtn');
-            btn.innerHTML='CONNECTING...'; btn.disabled=true;
-            SoundEngine.play('click');
+            btn.innerHTML='CONNECTING...'; btn.disabled=true; SoundEngine.play('click');
             document.getElementById('mmMobileBanner').classList.remove('show');
             try {
                 const acc=await window.ethereum.request({method:'eth_requestAccounts'});
-                userAddress=acc[0];
-                SoundEngine.play('success');
+                userAddress=acc[0]; SoundEngine.play('success');
                 document.getElementById('walletStatus').textContent='Wallet connected!';
-                updateOnboardingUI();
-                await loadTotalScore();
-                loadLeaderboard();
-                loadWinners();
+                updateOnboardingUI(); await loadTotalScore(); loadLeaderboard(); loadWinners();
             } catch(e) {
                 btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> CONNECT WALLET';
-                btn.disabled=false;
-                document.getElementById('walletStatus').textContent='Connection failed';
+                btn.disabled=false; document.getElementById('walletStatus').textContent='Connection failed';
             }
         }
         
         function enterContest(){
             if(!userAddress){ alert('Connect wallet first!'); return; }
             if(hasEntered){ alert('Already entered!'); return; }
-            hasEntered=true;
-            SoundEngine.play('success');
-            updateOnboardingUI();
-            loadLeaderboard();
+            hasEntered=true; SoundEngine.play('success'); updateOnboardingUI(); loadLeaderboard();
         }
         
-        // ========== FIX #3: DON'T set gameStarted=true here ==========
         function startGame(){
-            if(!hasEntered) return;
-            SoundEngine.play('click');
-            initGame(); // sets gameStarted=false
-            document.getElementById('onboardingOverlay').classList.remove('active');
+            if(!hasEntered) return; SoundEngine.play('click');
+            initGame(); document.getElementById('onboardingOverlay').classList.remove('active');
             document.getElementById('gameoverModal').classList.remove('active');
-            // Do NOT set gameStarted=true — let the first tap do it
         }
         
         let soundTimeout;
         function showSoundIndicator(t){
             const el=document.getElementById('soundIndicator');
             el.textContent=t; el.classList.add('show');
-            clearTimeout(soundTimeout);
-            soundTimeout=setTimeout(()=>el.classList.remove('show'),1500);
+            clearTimeout(soundTimeout); soundTimeout=setTimeout(()=>el.classList.remove('show'),1500);
         }
         
-        // ==================== EVENTS ====================
         document.getElementById('soundToggle').addEventListener('click',()=>{
             const on=SoundEngine.toggle();
             document.getElementById('soundOnIcon').style.display=on?'block':'none';
@@ -1334,17 +1224,10 @@
         document.getElementById('onboardingEntryBtn').addEventListener('click',enterContest);
         document.getElementById('onboardingStartBtn').addEventListener('click',startGame);
         
-        // ========== FIX #3: playBtn also shouldn't set gameStarted ==========
         document.getElementById('playBtn').addEventListener('click',()=>{
             SoundEngine.play('click');
-            if(!hasEntered){
-                document.getElementById('onboardingOverlay').classList.add('active');
-                updateOnboardingUI();
-            } else {
-                initGame(); // gameStarted=false
-                document.getElementById('gameoverModal').classList.remove('active');
-                // Do NOT set gameStarted=true
-            }
+            if(!hasEntered){ document.getElementById('onboardingOverlay').classList.add('active'); updateOnboardingUI(); }
+            else { initGame(); document.getElementById('gameoverModal').classList.remove('active'); }
         });
         
         document.getElementById('entryBtn').addEventListener('click',()=>{SoundEngine.play('click');enterContest();});
@@ -1353,52 +1236,29 @@
             if(!userAddress){document.getElementById('onboardingOverlay').classList.add('active');updateOnboardingUI();}
         });
         
-        // ========== FIX #3: restartBtn same fix ==========
         document.getElementById('restartBtn').addEventListener('click',()=>{
-            SoundEngine.play('click');
-            initGame(); // gameStarted=false
-            document.getElementById('gameoverModal').classList.remove('active');
-            // Do NOT set gameStarted=true
+            SoundEngine.play('click'); initGame(); document.getElementById('gameoverModal').classList.remove('active');
         });
         
         document.getElementById('closeModalBtn').addEventListener('click',()=>{
-            SoundEngine.play('click');
-            document.getElementById('gameoverModal').classList.remove('active');
+            SoundEngine.play('click'); document.getElementById('gameoverModal').classList.remove('active');
         });
         
-        // Canvas input — first tap sets gameStarted=true
         canvas.addEventListener('click',()=>{
-            if(gameRunning && !gameStarted){
-                gameStarted = true; // First tap starts the actual game
-                jump();
-            } else {
-                jump();
-            }
+            if(gameRunning && !gameStarted){ gameStarted = true; jump(); } else { jump(); }
         });
-        
         canvas.addEventListener('touchstart',(e)=>{
             e.preventDefault();
-            if(gameRunning && !gameStarted){
-                gameStarted = true;
-                jump();
-            } else {
-                jump();
-            }
+            if(gameRunning && !gameStarted){ gameStarted = true; jump(); } else { jump(); }
         },{passive:false});
         
         document.addEventListener('keydown',(e)=>{
             if(e.code==='Space'){
                 e.preventDefault();
-                if(gameRunning && !gameStarted){
-                    gameStarted = true;
-                    jump();
-                } else {
-                    jump();
-                }
+                if(gameRunning && !gameStarted){ gameStarted = true; jump(); } else { jump(); }
             }
         });
         
-        // Nav tabs
         document.querySelectorAll('.nav-links a').forEach(l=>l.addEventListener('click',()=>{
             SoundEngine.play('click');
             document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
@@ -1411,8 +1271,7 @@
         
         document.getElementById('reminderBtn').addEventListener('click',()=>{
             SoundEngine.play('click');
-            document.getElementById('onboardingOverlay').classList.add('active');
-            updateOnboardingUI();
+            document.getElementById('onboardingOverlay').classList.add('active'); updateOnboardingUI();
         });
         
         document.getElementById('onboardingOverlay').addEventListener('click',(e)=>{
@@ -1420,12 +1279,9 @@
                 document.getElementById('onboardingOverlay').classList.remove('active');
         });
         
-        const obs=new IntersectionObserver(e=>e.forEach(en=>{
-            if(en.isIntersecting)en.target.classList.add('visible');
-        }),{threshold:0.1});
+        const obs=new IntersectionObserver(e=>e.forEach(en=>{ if(en.isIntersecting)en.target.classList.add('visible'); }),{threshold:0.1});
         document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
         
-        // ==================== INIT ====================
         ThemeManager.init();
         ContestTimer.init();
         gameLoop();
