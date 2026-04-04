@@ -1,4 +1,4 @@
-node_modules/
-.DS_Store
-.env
-*.log
+*.ts linguist-language=TypeScript
+*.js linguist-language=JavaScript
+*.html linguist-language=HTML
+*.md linguist-language=Markdown
