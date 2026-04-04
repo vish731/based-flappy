@@ -1,0 +1,2 @@
+const REPO_VERSION = "1.0.0";
+const REPO_NAME = "BASED-FLAPPY";
