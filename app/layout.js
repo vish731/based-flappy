@@ -11,8 +11,3 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   )
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> f073ded0218e36849256bdbf672334f344ea3be1
