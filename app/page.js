@@ -15,4 +15,8 @@ export default function Home() {
       allow="ethereum"
     />
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f073ded0218e36849256bdbf672334f344ea3be1
