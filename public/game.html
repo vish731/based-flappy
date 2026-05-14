@@ -294,6 +294,6 @@
         document.getElementById('onboardingOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('onboardingOverlay'))document.getElementById('onboardingOverlay').classList.remove('active')});
         new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')}),{threshold:.1}).observe(document.querySelectorAll('.fade-in')[0]);
         ThemeManager.init();ContestTimer.init();updateOnboardingUI();gameLoop();loadLeaderboard();loadWinners();
-    </script>
+    </script>>
 </body>
 </html>
