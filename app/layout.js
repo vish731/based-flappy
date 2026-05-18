@@ -1,18 +1,14 @@
-export default function Home() {
+import './globals.css'
+
+export const metadata = {
+  title: 'BASED-FLAPPY | Weekly ETH Contest',
+  description: 'Competitive Web3 Flappy Bird on Base blockchain. Play, compete, earn ETH.',
+}
+
+export default function RootLayout({ children }) {
   return (
-    <iframe
-      src="/game.html"
-      style={{
-        width: '100vw',
-        height: '100vh',
-        border: 'none',
-        margin: 0,
-        padding: 0,
-        display: 'block',
-        overflow: 'hidden'
-      }}
-      title="BASED-FLAPPY"
-      allow="ethereum"
-    />
+    <html lang="en" data-theme="dark">
+      <body>{children}</body>
+    </html>
   )
-} 
+}
