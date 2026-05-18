@@ -1,1 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: #3B82F6;
+  --primary-glow: rgba(59,130,246,0.4);
+  --accent: #8B5CF6;
+  --gold: #FFD700;
+  --silver: #C0C0C0;
+  --bronze: #CD7F32;
+  --text: #E2E8F0;
+  --text-muted: #64748B;
+}
+
+[data-theme="dark"] {
+  --bg: #060A13;
+  --bg-card: rgba(15,20,35,0.85);
+  --bg-card-solid: #0F1423;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --nav-bg: rgba(6,10,19,0.92);
+  --overlay-bg: rgba(0,0,0,0.88);
+  --input-bg: rgba(255,255,255,0.04);
+  --shadow: 0 0 40px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg: #F1F5F9;
+  --bg-card: rgba(255,255,255,0.9);
+  --bg-card-solid: #FFFFFF;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.15);
+  --nav-bg: rgba(255,255,255,0.92);
+  --overlay-bg: rgba(0,0,0,0.5);
+  --input-bg: rgba(0,0,0,0.04);
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --text: #1E293B;
+  --text-muted: #64748B;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+[data-theme="dark"] body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.2); border-radius: 3px; }
+* { scrollbar-width: thin; scrollbar-color: rgba(59,130,246,0.2) transparent; }
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.88) translateY(40px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.animate-pulse-dot { animation: pulse 2s infinite; }
+.animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+.animate-fade-in { animation: fadeInUp 0.6s cubic-bezier(.4,0,.2,1) forwards; }
+.animate-scale-in { animation: scaleIn 0.5s cubic-bezier(.4,0,.2,1) forwards; }
+
+/* Canvas */
+canvas {
+  border-radius: 18px;
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Nav links */
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.nav-link:hover { color: var(--text); background: var(--input-bg); }
+.nav-link.active {
+  color: var(--primary);
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+}
+
+/* Leaderboard */
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+.leaderboard-item:last-child { border-bottom: none; }
+.leaderboard-score {
+  font-weight: 800;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Tx link */
+.tx-link {
+  color: var(--primary);
+  font-size: 10px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 4px;
+}
+.tx-link:hover { color: var(--accent); }
 
