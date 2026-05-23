@@ -74,16 +74,16 @@ export default function Onboarding({
       const p = getProvider()
 
       // Encode enterContest() function call
-      // Function selector: keccak256("enterContest()") = 0x278ecde1
+      // keccak256("enterContest()") = 0x278ecde1
       const data = '0x278ecde1'
 
       const txHash = await p.request({
         method: 'eth_sendTransaction',
         params: [{
           from: userAddress,
-          to: CONTRACT_ADDRESS,      // Contract, not personal wallet
-          value: ENTRY_FEE_HEX,      // 0.00005 ETH
-          data: data,                // calls enterContest()
+          to: CONTRACT_ADDRESS,
+          value: '0x2d79883d2000',   // 0.00005 ETH = 50000000000000 wei
+          data: data,
           chainId: BASE_CHAIN_ID
         }]
       })
