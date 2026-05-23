@@ -6,7 +6,7 @@ import {
   getProvider, hasProvider, isMobileDevice,
   detectWalletName, getDeepLinks,
   checkNetwork, switchToBase,
-  PRIZE_WALLET, ENTRY_FEE_HEX, BASE_CHAIN_ID
+  CONTRACT_ADDRESS, CONTRACT_ABI, ENTRY_FEE_HEX, BASE_CHAIN_ID
 } from '@/lib/wallet'
 import { supabase, getWeekNumber } from '@/lib/supabase'
 
@@ -61,21 +61,40 @@ export default function Onboarding({
     setIsOnBase(onBase)
   }
 
+  // ── Enter via Smart Contract ─────────────────────────────────
   async function enterContest() {
     if (!userAddress) { alert('Connect wallet first!'); return }
     if (hasEntered) { alert('Already entered this week!'); return }
     if (!isOnBase) { await handleSwitchToBase(); return }
+
     setPayingEntry(true)
     SoundEngine.play('click')
+
     try {
       const p = getProvider()
+
+      // Encode enterContest() function call
+      // Function selector: keccak256("enterContest()") = 0x278ecde1
+      const data = '0x278ecde1'
+
       const txHash = await p.request({
         method: 'eth_sendTransaction',
-        params: [{ from: userAddress, to: PRIZE_WALLET, value: ENTRY_FEE_HEX, chainId: BASE_CHAIN_ID }]
+        params: [{
+          from: userAddress,
+          to: CONTRACT_ADDRESS,      // Contract, not personal wallet
+          value: ENTRY_FEE_HEX,      // 0.00005 ETH
+          data: data,                // calls enterContest()
+          chainId: BASE_CHAIN_ID
+        }]
       })
-      await new Promise(r => setTimeout(r, 3000))
+
+      // Wait for confirmation
+      await new Promise(r => setTimeout(r, 4000))
+
       setHasEntered(true)
       SoundEngine.play('success')
+
+      // Record in Supabase
       try {
         await supabase.from('entries').insert({
           wallet_address: userAddress,
@@ -83,10 +102,17 @@ export default function Onboarding({
           week_number: getWeekNumber(),
           amount_eth: 0.00005
         })
-      } catch (dbErr) { console.warn('Entry record non-critical:', dbErr) }
-      setWalletStatus('Entry confirmed! TX: ' + txHash.slice(0, 10) + '...')
+      } catch (dbErr) { console.warn('DB record non-critical:', dbErr) }
+
+      setWalletStatus('Entry confirmed! You are in this week\'s contest.')
+
     } catch (e) {
-      setWalletStatus(e.code === 4001 ? 'Transaction cancelled.' : 'Transaction failed.')
+      console.error('Entry error:', e)
+      if (e.code === 4001) {
+        setWalletStatus('Transaction cancelled.')
+      } else {
+        setWalletStatus('Transaction failed. Try again.')
+      }
     } finally {
       setPayingEntry(false)
     }
@@ -133,7 +159,7 @@ export default function Onboarding({
             pointerEvents: 'none'
           }} />
 
-          {/* Top gradient border */}
+          {/* Top gradient line */}
           <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.5), rgba(139,92,246,0.5), transparent)' }} />
 
           {/* Header */}
@@ -193,16 +219,17 @@ export default function Onboarding({
               <div style={{
                 fontFamily: "'Orbitron', sans-serif",
                 fontSize: '28px', fontWeight: 900, color: '#FFD700',
-                textShadow: '0 0 40px rgba(255,215,0,0.4)', marginBottom: '4px'
+                textShadow: '0 0 40px rgba(255,215,0,0.4)', marginBottom: '6px'
               }}>
                 {prizePool.toFixed(5)} ETH
               </div>
-              {/* Formula highlight */}
+
+              {/* Formula */}
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: '8px', padding: '5px 12px', marginBottom: '14px', marginTop: '4px'
+                borderRadius: '8px', padding: '5px 12px', marginBottom: '14px'
               }}>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
                   {totalEntries} entries
@@ -211,7 +238,7 @@ export default function Onboarding({
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
                   0.00005 ETH
                 </span>
-                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)'}}>=</span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>=</span>
                 <span style={{ fontSize: '9px', color: '#FFD700', fontWeight: 700, fontFamily: 'monospace' }}>
                   {prizePool.toFixed(5)} ETH
                 </span>
@@ -291,7 +318,7 @@ export default function Onboarding({
             ))}
           </div>
 
-          {/* Note */}
+          {/* Contract note */}
           <div style={{ padding: '12px 22px 0' }}>
             <div style={{
               background: 'rgba(255,255,255,0.02)',
@@ -300,7 +327,8 @@ export default function Onboarding({
               fontSize: '10px', color: 'rgba(255,255,255,0.25)',
               lineHeight: 1.7, textAlign: 'center', letterSpacing: '0.2px'
             }}>
-              Entry is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.00005 ETH</span> on Base mainnet · Non-refundable · Scores only count after entry
+              Entry fee goes to the <span style={{ color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>BasedFlappy Prize Pool</span> contract on Base.
+              Non-refundable. Score only counts after entry.
             </div>
           </div>
 
@@ -372,7 +400,7 @@ export default function Onboarding({
                   transition: 'all 0.25s ease'
                 }}
               >
-                {payingEntry ? 'Confirming transaction...' : 'Pay & Enter — 0.00005 ETH'}
+                {payingEntry ? 'Processing entry...' : 'Pay & Enter — 0.00005 ETH'}
               </button>
             ) : (
               <div style={{
@@ -415,6 +443,7 @@ export default function Onboarding({
               </button>
             )}
 
+            {/* Status */}
             <div style={{
               textAlign: 'center', fontSize: '10px', paddingTop: '2px',
               color: canStart ? '#4ADE80' : 'rgba(255,255,255,0.18)',
