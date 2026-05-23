@@ -6,7 +6,7 @@ import {
   getProvider, hasProvider, isMobileDevice,
   detectWalletName, getDeepLinks,
   checkNetwork, switchToBase,
-  CONTRACT_ADDRESS, CONTRACT_ABI, ENTRY_FEE_HEX, BASE_CHAIN_ID
+  PRIZE_WALLET, ENTRY_FEE_HEX, BASE_CHAIN_ID
 } from '@/lib/wallet'
 import { supabase, getWeekNumber } from '@/lib/supabase'
 
@@ -61,7 +61,6 @@ export default function Onboarding({
     setIsOnBase(onBase)
   }
 
-  // ── Enter via Smart Contract ─────────────────────────────────
   async function enterContest() {
     if (!userAddress) { alert('Connect wallet first!'); return }
     if (hasEntered) { alert('Already entered this week!'); return }
@@ -69,32 +68,24 @@ export default function Onboarding({
 
     setPayingEntry(true)
     SoundEngine.play('click')
-
     try {
       const p = getProvider()
 
-      // Encode enterContest() function call
-      // keccak256("enterContest()") = 0x278ecde1
-      const data = '0x278ecde1'
-
+      // Simple direct ETH transfer — 0.00005 ETH to prize wallet
       const txHash = await p.request({
         method: 'eth_sendTransaction',
         params: [{
           from: userAddress,
-          to: CONTRACT_ADDRESS,
-          value: '0x2d79883d2000',   // 0.00005 ETH = 50000000000000 wei
-          data: data,
+          to: PRIZE_WALLET,
+          value: ENTRY_FEE_HEX,  // 0x2d79883d2000 = 0.00005 ETH
           chainId: BASE_CHAIN_ID
         }]
       })
 
-      // Wait for confirmation
-      await new Promise(r => setTimeout(r, 4000))
-
+      await new Promise(r => setTimeout(r, 3000))
       setHasEntered(true)
       SoundEngine.play('success')
 
-      // Record in Supabase
       try {
         await supabase.from('entries').insert({
           wallet_address: userAddress,
@@ -107,7 +98,6 @@ export default function Onboarding({
       setWalletStatus('Entry confirmed! You are in this week\'s contest.')
 
     } catch (e) {
-      console.error('Entry error:', e)
       if (e.code === 4001) {
         setWalletStatus('Transaction cancelled.')
       } else {
@@ -159,7 +149,7 @@ export default function Onboarding({
             pointerEvents: 'none'
           }} />
 
-          {/* Top gradient line */}
+          {/* Top line */}
           <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.5), rgba(139,92,246,0.5), transparent)' }} />
 
           {/* Header */}
@@ -180,10 +170,8 @@ export default function Onboarding({
                 Live Contest
               </span>
             </div>
-
             <div style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: '22px', fontWeight: 900,
+              fontFamily: "'Orbitron', sans-serif", fontSize: '22px', fontWeight: 900,
               background: 'linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               letterSpacing: '1px', marginBottom: '7px'
@@ -217,9 +205,8 @@ export default function Onboarding({
                 Weekly Prize Pool
               </div>
               <div style={{
-                fontFamily: "'Orbitron', sans-serif",
-                fontSize: '28px', fontWeight: 900, color: '#FFD700',
-                textShadow: '0 0 40px rgba(255,215,0,0.4)', marginBottom: '6px'
+                fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 900,
+                color: '#FFD700', textShadow: '0 0 40px rgba(255,215,0,0.4)', marginBottom: '6px'
               }}>
                 {prizePool.toFixed(5)} ETH
               </div>
@@ -227,21 +214,14 @@ export default function Onboarding({
               {/* Formula */}
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: '8px', padding: '5px 12px', marginBottom: '14px'
               }}>
-                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-                  {totalEntries} entries
-                </span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>{totalEntries} entries</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>×</span>
-                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-                  0.00005 ETH
-                </span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>0.00005 ETH</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>=</span>
-                <span style={{ fontSize: '9px', color: '#FFD700', fontWeight: 700, fontFamily: 'monospace' }}>
-                  {prizePool.toFixed(5)} ETH
-                </span>
+                <span style={{ fontSize: '9px', color: '#FFD700', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
               </div>
 
               <div style={{ display: 'flex', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -250,14 +230,8 @@ export default function Onboarding({
                   { pct: '40%', label: '2nd Place', color: '#94A3B8', glow: 'rgba(148,163,184,0.2)' },
                   { pct: '10%', label: '3rd Place', color: '#CD7F32', glow: 'rgba(205,127,50,0.2)' },
                 ].map((item, i) => (
-                  <div key={i} style={{
-                    flex: 1, textAlign: 'center',
-                    borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none'
-                  }}>
-                    <div style={{
-                      fontFamily: "'Orbitron', sans-serif", fontSize: '16px', fontWeight: 800,
-                      color: item.color, textShadow: '0 0 20px ' + item.glow
-                    }}>{item.pct}</div>
+                  <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                    <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '16px', fontWeight: 800, color: item.color, textShadow: '0 0 20px ' + item.glow }}>{item.pct}</div>
                     <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.25)', marginTop: '3px', fontWeight: 500 }}>{item.label}</div>
                   </div>
                 ))}
@@ -281,12 +255,9 @@ export default function Onboarding({
               }}>
                 <div style={{
                   width: '28px', height: '28px', minWidth: '28px', borderRadius: '8px',
-                  background: step.done
-                    ? 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1))'
-                    : 'rgba(255,255,255,0.03)',
+                  background: step.done ? 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1))' : 'rgba(255,255,255,0.03)',
                   border: step.done ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.07)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.4s ease',
                   boxShadow: step.done ? '0 0 12px rgba(34,197,94,0.15)' : 'none'
                 }}>
                   {step.done ? (
@@ -297,62 +268,42 @@ export default function Onboarding({
                     <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>{step.num}</span>
                   )}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <span style={{
-                    fontSize: '12px', fontWeight: 500,
-                    color: step.done ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.38)',
-                    transition: 'color 0.4s ease'
-                  }}>
-                    {step.label}
-                  </span>
-                </div>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: step.done ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.38)' }}>
+                  {step.label}
+                </span>
                 {step.done && (
                   <div style={{
-                    fontSize: '8px', color: '#22C55E', fontWeight: 700,
-                    background: 'rgba(34,197,94,0.08)',
-                    border: '1px solid rgba(34,197,94,0.15)',
-                    padding: '2px 8px', borderRadius: '100px', letterSpacing: '0.5px'
+                    marginLeft: 'auto', fontSize: '8px', color: '#22C55E', fontWeight: 700,
+                    background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)',
+                    padding: '2px 8px', borderRadius: '100px'
                   }}>DONE</div>
                 )}
               </div>
             ))}
           </div>
 
-          {/* Contract note */}
+          {/* Note */}
           <div style={{ padding: '12px 22px 0' }}>
             <div style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.05)',
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
               borderRadius: '10px', padding: '10px 14px',
               fontSize: '10px', color: 'rgba(255,255,255,0.25)',
-              lineHeight: 1.7, textAlign: 'center', letterSpacing: '0.2px'
+              lineHeight: 1.7, textAlign: 'center'
             }}>
-              Entry fee goes to the <span style={{ color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>BasedFlappy Prize Pool</span> contract on Base.
+              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.00005 ETH</span> on Base mainnet.
               Non-refundable. Score only counts after entry.
             </div>
           </div>
 
-          {/* Mobile Wallet Banner */}
+          {/* Mobile Banner */}
           {showWalletBanner && (
             <div style={{ padding: '10px 22px 0' }}>
-              <div style={{
-                background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.1)',
-                borderRadius: '10px', padding: '12px', textAlign: 'center'
-              }}>
+              <div style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.1)', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: '#F59E0B', marginBottom: '3px' }}>No wallet detected</div>
                 <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>Open this page inside your wallet browser</div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => window.location.href = deepLinks.open} style={{
-                    flex: 1, padding: '8px', borderRadius: '8px', border: 'none',
-                    fontSize: '10px', fontWeight: 700, cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#000'
-                  }}>Open in MetaMask</button>
-                  <button onClick={() => window.open(deepLinks.install, '_blank')} style={{
-                    flex: 1, padding: '8px', borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.07)', fontSize: '10px',
-                    fontWeight: 700, cursor: 'pointer',
-                    background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.35)'
-                  }}>Install MetaMask</button>
+                  <button onClick={() => window.location.href = deepLinks.open} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: 'none', fontSize: '10px', fontWeight: 700, cursor: 'pointer', background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#000' }}>Open in MetaMask</button>
+                  <button onClick={() => window.open(deepLinks.install, '_blank')} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '10px', fontWeight: 700, cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.35)' }}>Install MetaMask</button>
                 </div>
               </div>
             </div>
@@ -370,9 +321,7 @@ export default function Onboarding({
                 fontSize: '12px', fontWeight: 700, letterSpacing: '1px',
                 cursor: canStart ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px',
-                background: canStart
-                  ? 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)'
-                  : 'rgba(255,255,255,0.03)',
+                background: canStart ? 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' : 'rgba(255,255,255,0.03)',
                 color: canStart ? '#fff' : 'rgba(255,255,255,0.12)',
                 boxShadow: canStart ? '0 6px 30px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
                 transition: 'all 0.25s ease'
@@ -390,13 +339,10 @@ export default function Onboarding({
                 style={{
                   width: '100%', padding: '14px', borderRadius: '13px',
                   border: canPayEntry ? '1px solid rgba(59,130,246,0.25)' : '1px solid rgba(255,255,255,0.04)',
-                  fontSize: '12px', fontWeight: 600, letterSpacing: '0.3px',
+                  fontSize: '12px', fontWeight: 600,
                   cursor: canPayEntry ? 'pointer' : 'not-allowed',
-                  background: canPayEntry
-                    ? 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))'
-                    : 'rgba(255,255,255,0.02)',
+                  background: canPayEntry ? 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))' : 'rgba(255,255,255,0.02)',
                   color: canPayEntry ? '#93C5FD' : 'rgba(255,255,255,0.12)',
-                  boxShadow: canPayEntry ? 'inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
                   transition: 'all 0.25s ease'
                 }}
               >
@@ -421,10 +367,8 @@ export default function Onboarding({
             {userAddress && !isOnBase && (
               <button onClick={handleSwitchToBase} style={{
                 width: '100%', padding: '12px', borderRadius: '13px',
-                border: '1px solid rgba(59,130,246,0.12)', fontSize: '11px',
-                fontWeight: 600, cursor: 'pointer',
-                background: 'rgba(59,130,246,0.05)', color: 'rgba(96,165,250,0.6)',
-                transition: 'all 0.2s ease'
+                border: '1px solid rgba(59,130,246,0.12)', fontSize: '11px', fontWeight: 600,
+                cursor: 'pointer', background: 'rgba(59,130,246,0.05)', color: 'rgba(96,165,250,0.6)'
               }}>
                 Switch to Base Network
               </button>
@@ -434,20 +378,16 @@ export default function Onboarding({
             {!userAddress && (
               <button disabled={connecting} onClick={connectWallet} style={{
                 width: '100%', padding: '12px', borderRadius: '13px',
-                border: '1px solid rgba(255,255,255,0.06)', fontSize: '11px',
-                fontWeight: 600, cursor: 'pointer',
-                background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.4)',
-                transition: 'all 0.2s ease'
+                border: '1px solid rgba(255,255,255,0.06)', fontSize: '11px', fontWeight: 600,
+                cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.4)'
               }}>
                 {connecting ? 'Connecting...' : 'Connect Wallet'}
               </button>
             )}
 
-            {/* Status */}
             <div style={{
               textAlign: 'center', fontSize: '10px', paddingTop: '2px',
-              color: canStart ? '#4ADE80' : 'rgba(255,255,255,0.18)',
-              fontWeight: 500, letterSpacing: '0.3px'
+              color: canStart ? '#4ADE80' : 'rgba(255,255,255,0.18)', fontWeight: 500
             }}>
               {canStart ? 'All set. You are ready to play.'
                 : !userAddress ? 'Connect your wallet to get started'
@@ -455,7 +395,6 @@ export default function Onboarding({
                 : 'Pay entry fee to unlock the game'}
             </div>
           </div>
-
         </div>
       </div>
     </div>
