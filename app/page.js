@@ -10,7 +10,6 @@ import Docs from '@/components/Docs'
 import { supabase, getWeekNumber } from '@/lib/supabase'
 import { SoundEngine } from '@/lib/sound'
 
-// ── Contest Timer ────────────────────────────────────────────
 function getCountdown() {
   const now = new Date()
   const day = now.getDay()
@@ -32,28 +31,23 @@ export default function Home() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [activeTab, setActiveTab] = useState('game')
 
-  // Wallet state
   const [userAddress, setUserAddress] = useState(null)
   const [hasEntered, setHasEntered] = useState(false)
   const [isOnBase, setIsOnBase] = useState(false)
   const [walletStatus, setWalletStatus] = useState('')
 
-  // Game state
   const [totalScore, setTotalScore] = useState(0)
   const [showOnboarding, setShowOnboarding] = useState(true)
   const [showGameOver, setShowGameOver] = useState(false)
   const [lastScore, setLastScore] = useState(0)
   const [prizePool, setPrizePool] = useState(0)
-
-  // Timer
   const [countdown, setCountdown] = useState(getCountdown())
 
-  // Sound indicator
   const [soundMsg, setSoundMsg] = useState('')
   const [soundMsgVisible, setSoundMsgVisible] = useState(false)
   const soundTimerRef = useRef(null)
 
-  // ── Theme ──────────────────────────────────────────────────
+  // Theme
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'dark'
     setTheme(saved)
@@ -68,7 +62,6 @@ export default function Home() {
     SoundEngine.play('click')
   }
 
-  // ── Sound ──────────────────────────────────────────────────
   function toggleSound() {
     const on = SoundEngine.toggle()
     setSoundEnabled(on)
@@ -78,61 +71,88 @@ export default function Home() {
     soundTimerRef.current = setTimeout(() => setSoundMsgVisible(false), 1500)
   }
 
-  // ── Timer ──────────────────────────────────────────────────
+  // Timer
   useEffect(() => {
     const t = setInterval(() => setCountdown(getCountdown()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  // ── Prize Pool ─────────────────────────────────────────────
+  // Prize pool — count from entries table
   useEffect(() => {
     loadPrizePool()
   }, [])
 
   async function loadPrizePool() {
     try {
-      const { data } = await supabase
-        .from('scores').select('wallet_address')
-        .eq('week_number', getWeekNumber())
-      setPrizePool((data?.length || 0) * 0.00005)
+      const wk = getWeekNumber()
+      const { data, error } = await supabase
+        .from('entries')
+        .select('wallet_address')
+        .eq('week_number', wk)
+      if (!error && data) {
+        setPrizePool(data.length * 0.00005)
+      }
     } catch (e) {}
   }
 
-  // ── Total score from DB ────────────────────────────────────
+  // Check entry status from Supabase when wallet connects
   useEffect(() => {
     if (!userAddress) return
+    checkEntryStatus()
     loadTotalScore()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress])
+
+  async function checkEntryStatus() {
+    try {
+      const wk = getWeekNumber()
+      const { data } = await supabase
+        .from('entries')
+        .select('wallet_address')
+        .eq('wallet_address', userAddress)
+        .eq('week_number', wk)
+        .single()
+      if (data) {
+        setHasEntered(true)
+      }
+    } catch (e) {
+      // No entry found — keep hasEntered false
+    }
+  }
 
   async function loadTotalScore() {
     try {
       const { data } = await supabase
-        .from('scores').select('total_score')
+        .from('scores')
+        .select('total_score')
         .eq('wallet_address', userAddress)
-        .eq('week_number', getWeekNumber()).single()
+        .eq('week_number', getWeekNumber())
+        .single()
       if (data) setTotalScore(data.total_score || 0)
     } catch (e) {}
   }
 
-  // ── Game Over handler ──────────────────────────────────────
   function handleGameOver(score, total) {
     setLastScore(score)
     setTotalScore(total)
     setShowGameOver(true)
+    // Refresh prize pool after game
+    loadPrizePool()
   }
 
-  // ── Restart ────────────────────────────────────────────────
   function handleRestart() {
     setShowGameOver(false)
-    // Game component handles re-init via START GAME button
   }
 
-  // ── Tab change ─────────────────────────────────────────────
   function handleTabChange(tab) {
     setActiveTab(tab)
     if (tab === 'game' && !hasEntered) setShowOnboarding(true)
+    if (tab === 'leaderboard') loadPrizePool()
   }
+
+  // After entry confirmed — refresh prize pool
+  useEffect(() => {
+    if (hasEntered) loadPrizePool()
+  }, [hasEntered])
 
   const timerBlock = (val) => (
     <span style={{
@@ -145,7 +165,6 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {/* Navbar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleTabChange}
@@ -156,15 +175,12 @@ export default function Home() {
         toggleSound={toggleSound}
       />
 
-      {/* Main Content */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '124px 20px 40px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '88px 20px 40px' }}>
 
-        {/* ── GAME TAB ── */}
         {activeTab === 'game' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* Badges */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {/* Info badge */}
               <div style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderRadius: '12px', padding: '10px 16px', fontSize: '12px',
@@ -181,7 +197,6 @@ export default function Home() {
                 <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
                 <span>Prize: <span style={{ color: 'var(--gold)', fontWeight: 700, fontFamily: "'Orbitron', sans-serif", fontSize: '11px' }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
-              {/* Timer badge */}
               <div style={{
                 background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.08))',
                 border: '1px solid rgba(239,68,68,0.15)', borderRadius: '12px',
@@ -199,7 +214,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Game Canvas */}
             <Game
               hasEntered={hasEntered}
               userAddress={userAddress}
@@ -210,33 +224,27 @@ export default function Home() {
               setTotalScore={setTotalScore}
             />
 
-            {/* Wallet status */}
             {walletStatus && (
               <div style={{ marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}
                 dangerouslySetInnerHTML={{ __html: walletStatus }} />
             )}
 
-            {/* Network warning */}
             {userAddress && !isOnBase && (
               <div style={{
                 marginTop: '8px', fontSize: '11px', color: '#F59E0B',
                 background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
                 borderRadius: '8px', padding: '8px 12px', textAlign: 'center'
               }}>
-                ⚠️ Switch to Base network to play!
+                Switch to Base network to play!
               </div>
             )}
           </div>
         )}
 
-        {/* ── LEADERBOARD TAB ── */}
         {activeTab === 'leaderboard' && <Leaderboard />}
-
-        {/* ── DOCS TAB ── */}
         {activeTab === 'docs' && <Docs />}
       </div>
 
-      {/* Onboarding Overlay */}
       <Onboarding
         show={showOnboarding}
         onClose={() => setShowOnboarding(false)}
@@ -244,14 +252,16 @@ export default function Home() {
         userAddress={userAddress}
         setUserAddress={setUserAddress}
         hasEntered={hasEntered}
-        setHasEntered={setHasEntered}
+        setHasEntered={(val) => {
+          setHasEntered(val)
+          if (val) loadPrizePool() // refresh prize pool on entry
+        }}
         isOnBase={isOnBase}
         setIsOnBase={setIsOnBase}
-        onStart={() => { setShowOnboarding(false) }}
+        onStart={() => setShowOnboarding(false)}
         setWalletStatus={setWalletStatus}
       />
 
-      {/* Game Over Modal */}
       <GameOver
         show={showGameOver}
         currentScore={lastScore}
@@ -260,7 +270,6 @@ export default function Home() {
         onClose={() => setShowGameOver(false)}
       />
 
-      {/* Help Button */}
       <button
         onClick={() => { SoundEngine.play('click'); setShowOnboarding(true) }}
         style={{
@@ -274,7 +283,6 @@ export default function Home() {
         }}
       >?</button>
 
-      {/* Sound Indicator */}
       <div style={{
         position: 'fixed', bottom: '76px', right: '20px',
         background: 'var(--bg-card-solid)', border: '1px solid var(--border)',
@@ -289,4 +297,3 @@ export default function Home() {
     </div>
   )
 }
-
