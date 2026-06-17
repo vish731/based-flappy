@@ -46,6 +46,7 @@ export default function Home() {
   const [soundMsg, setSoundMsg] = useState('')
   const [soundMsgVisible, setSoundMsgVisible] = useState(false)
   const soundTimerRef = useRef(null)
+  const gameRef = useRef(null)
 
   // Theme
   useEffect(() => {
@@ -141,6 +142,7 @@ export default function Home() {
 
   function handleRestart() {
     setShowGameOver(false)
+    gameRef.current?.restart()
   }
 
   function handleTabChange(tab) {
@@ -215,6 +217,7 @@ export default function Home() {
             </div>
 
             <Game
+              ref={gameRef}
               hasEntered={hasEntered}
               userAddress={userAddress}
               theme={theme}
