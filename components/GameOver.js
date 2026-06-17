@@ -96,4 +96,3 @@ export default function GameOver({ show, currentScore, totalScore, onRestart, on
     </div>
   )
 }
-
