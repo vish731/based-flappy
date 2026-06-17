@@ -128,9 +128,9 @@ export default function Onboarding({
     >
       <div style={{ width: '100%', maxWidth: '400px', maxHeight: '90vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
         <div style={{
-          background: 'linear-gradient(160deg, #0A0E1A 0%, #0D1120 50%, #090D18 100%)',
+          background: 'linear-gradient(160deg, #0B0E0C 0%, #0A0D0B 50%, #080A08 100%)',
           borderRadius: '22px',
-          border: '1px solid rgba(255,255,255,0.06)',
+          border: '1px solid rgba(34,197,94,0.1)',
           boxShadow: '0 50px 100px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05)',
           overflow: 'hidden', position: 'relative'
         }}>
@@ -139,18 +139,18 @@ export default function Onboarding({
           <div style={{
             position: 'absolute', top: '-60px', left: '-60px',
             width: '200px', height: '200px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)',
             pointerEvents: 'none'
           }} />
           <div style={{
             position: 'absolute', top: '-40px', right: '-40px',
             width: '160px', height: '160px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)',
             pointerEvents: 'none'
           }} />
 
           {/* Top line */}
-          <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.5), rgba(139,92,246,0.5), transparent)' }} />
+          <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(34,197,94,0.5), rgba(59,130,246,0.5), transparent)' }} />
 
           {/* Header */}
           <div style={{ padding: '24px 24px 0', textAlign: 'center', position: 'relative' }}>
@@ -180,7 +180,7 @@ export default function Onboarding({
             </div>
             <div style={{
               fontSize: '11px', letterSpacing: '0.5px',
-              background: 'linear-gradient(90deg, #3B82F6, #8B5CF6)',
+              background: 'linear-gradient(90deg, #22C55E, #3B82F6)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               fontWeight: 600
             }}>
@@ -191,14 +191,14 @@ export default function Onboarding({
           {/* Prize Pool */}
           <div style={{ padding: '18px 22px 0' }}>
             <div style={{
-              background: 'rgba(255,215,0,0.03)',
-              border: '1px solid rgba(255,215,0,0.1)',
+              background: 'rgba(34,197,94,0.03)',
+              border: '1px solid rgba(34,197,94,0.1)',
               borderRadius: '16px', padding: '18px', textAlign: 'center',
               position: 'relative', overflow: 'hidden'
             }}>
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.05) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.05) 0%, transparent 70%)',
                 pointerEvents: 'none'
               }} />
               <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '10px' }}>
@@ -206,7 +206,7 @@ export default function Onboarding({
               </div>
               <div style={{
                 fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 900,
-                color: '#FFD700', textShadow: '0 0 40px rgba(255,215,0,0.4)', marginBottom: '6px'
+                color: '#22C55E', textShadow: '0 0 40px rgba(34,197,94,0.4)', marginBottom: '6px'
               }}>
                 {prizePool.toFixed(5)} ETH
               </div>
@@ -221,12 +221,12 @@ export default function Onboarding({
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>×</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>0.00005 ETH</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>=</span>
-                <span style={{ fontSize: '9px', color: '#FFD700', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
+                <span style={{ fontSize: '9px', color: '#22C55E', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
               </div>
 
               <div style={{ display: 'flex', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 {[
-                  { pct: '50%', label: '1st Place', color: '#FFD700', glow: 'rgba(255,215,0,0.3)' },
+                  { pct: '50%', label: '1st Place', color: '#22C55E', glow: 'rgba(34,197,94,0.3)' },
                   { pct: '40%', label: '2nd Place', color: '#94A3B8', glow: 'rgba(148,163,184,0.2)' },
                   { pct: '10%', label: '3rd Place', color: '#CD7F32', glow: 'rgba(205,127,50,0.2)' },
                 ].map((item, i) => (
@@ -321,9 +321,9 @@ export default function Onboarding({
                 fontSize: '12px', fontWeight: 700, letterSpacing: '1px',
                 cursor: canStart ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px',
-                background: canStart ? 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' : 'rgba(255,255,255,0.03)',
+                background: canStart ? 'linear-gradient(135deg, #22C55E 0%, #3B82F6 100%)' : 'rgba(255,255,255,0.03)',
                 color: canStart ? '#fff' : 'rgba(255,255,255,0.12)',
-                boxShadow: canStart ? '0 6px 30px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
+                boxShadow: canStart ? '0 6px 30px rgba(34,197,94,0.35), inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
                 transition: 'all 0.25s ease'
               }}
             >
@@ -338,11 +338,11 @@ export default function Onboarding({
                 onClick={enterContest}
                 style={{
                   width: '100%', padding: '14px', borderRadius: '13px',
-                  border: canPayEntry ? '1px solid rgba(59,130,246,0.25)' : '1px solid rgba(255,255,255,0.04)',
+                  border: canPayEntry ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(255,255,255,0.04)',
                   fontSize: '12px', fontWeight: 600,
                   cursor: canPayEntry ? 'pointer' : 'not-allowed',
-                  background: canPayEntry ? 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))' : 'rgba(255,255,255,0.02)',
-                  color: canPayEntry ? '#93C5FD' : 'rgba(255,255,255,0.12)',
+                  background: canPayEntry ? 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.08))' : 'rgba(255,255,255,0.02)',
+                  color: canPayEntry ? '#4ADE80' : 'rgba(255,255,255,0.12)',
                   transition: 'all 0.25s ease'
                 }}
               >
