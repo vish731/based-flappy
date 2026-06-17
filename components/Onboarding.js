@@ -130,7 +130,7 @@ export default function Onboarding({
         <div style={{
           background: 'linear-gradient(160deg, #0B0E0C 0%, #0A0D0B 50%, #080A08 100%)',
           borderRadius: '22px',
-          border: '1px solid rgba(34,197,94,0.1)',
+          border: '1px solid rgba(59,130,246,0.1)',
           boxShadow: '0 50px 100px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05)',
           overflow: 'hidden', position: 'relative'
         }}>
@@ -139,7 +139,7 @@ export default function Onboarding({
           <div style={{
             position: 'absolute', top: '-60px', left: '-60px',
             width: '200px', height: '200px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)',
             pointerEvents: 'none'
           }} />
           <div style={{
@@ -150,7 +150,7 @@ export default function Onboarding({
           }} />
 
           {/* Top line */}
-          <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(34,197,94,0.5), rgba(59,130,246,0.5), transparent)' }} />
+          <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.5), rgba(59,130,246,0.5), transparent)' }} />
 
           {/* Header */}
           <div style={{ padding: '24px 24px 0', textAlign: 'center', position: 'relative' }}>
@@ -180,7 +180,7 @@ export default function Onboarding({
             </div>
             <div style={{
               fontSize: '11px', letterSpacing: '0.5px',
-              background: 'linear-gradient(90deg, #22C55E, #3B82F6)',
+              background: 'linear-gradient(90deg, #3B82F6, #3B82F6)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               fontWeight: 600
             }}>
@@ -191,14 +191,14 @@ export default function Onboarding({
           {/* Prize Pool */}
           <div style={{ padding: '18px 22px 0' }}>
             <div style={{
-              background: 'rgba(34,197,94,0.03)',
-              border: '1px solid rgba(34,197,94,0.1)',
+              background: 'rgba(59,130,246,0.03)',
+              border: '1px solid rgba(59,130,246,0.1)',
               borderRadius: '16px', padding: '18px', textAlign: 'center',
               position: 'relative', overflow: 'hidden'
             }}>
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.05) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.05) 0%, transparent 70%)',
                 pointerEvents: 'none'
               }} />
               <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '10px' }}>
@@ -206,7 +206,7 @@ export default function Onboarding({
               </div>
               <div style={{
                 fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 900,
-                color: '#22C55E', textShadow: '0 0 40px rgba(34,197,94,0.4)', marginBottom: '6px'
+                color: '#3B82F6', textShadow: '0 0 40px rgba(59,130,246,0.4)', marginBottom: '6px'
               }}>
                 {prizePool.toFixed(5)} ETH
               </div>
@@ -221,14 +221,14 @@ export default function Onboarding({
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>×</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>0.00005 ETH</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>=</span>
-                <span style={{ fontSize: '9px', color: '#22C55E', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
+                <span style={{ fontSize: '9px', color: '#3B82F6', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
               </div>
 
               <div style={{ display: 'flex', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 {[
-                  { pct: '50%', label: '1st Place', color: '#22C55E', glow: 'rgba(34,197,94,0.3)' },
-                  { pct: '40%', label: '2nd Place', color: '#94A3B8', glow: 'rgba(148,163,184,0.2)' },
-                  { pct: '10%', label: '3rd Place', color: '#CD7F32', glow: 'rgba(205,127,50,0.2)' },
+                  { pct: '50%', label: '1st Place', color: '#3B82F6', glow: 'rgba(59,130,246,0.3)' },
+                  { pct: '40%', label: '2nd Place', color: '#FFFFFF', glow: 'rgba(255,255,255,0.2)' },
+                  { pct: '10%', label: '3rd Place', color: '#EF4444', glow: 'rgba(239,68,68,0.2)' },
                 ].map((item, i) => (
                   <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
                     <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '16px', fontWeight: 800, color: item.color, textShadow: '0 0 20px ' + item.glow }}>{item.pct}</div>
@@ -255,13 +255,13 @@ export default function Onboarding({
               }}>
                 <div style={{
                   width: '28px', height: '28px', minWidth: '28px', borderRadius: '8px',
-                  background: step.done ? 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1))' : 'rgba(255,255,255,0.03)',
-                  border: step.done ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.07)',
+                  background: step.done ? 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1))' : 'rgba(255,255,255,0.03)',
+                  border: step.done ? '1px solid rgba(59,130,246,0.35)' : '1px solid rgba(255,255,255,0.07)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: step.done ? '0 0 12px rgba(34,197,94,0.15)' : 'none'
+                  boxShadow: step.done ? '0 0 12px rgba(59,130,246,0.15)' : 'none'
                 }}>
                   {step.done ? (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="3">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="3">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   ) : (
@@ -273,8 +273,8 @@ export default function Onboarding({
                 </span>
                 {step.done && (
                   <div style={{
-                    marginLeft: 'auto', fontSize: '8px', color: '#22C55E', fontWeight: 700,
-                    background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)',
+                    marginLeft: 'auto', fontSize: '8px', color: '#3B82F6', fontWeight: 700,
+                    background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.15)',
                     padding: '2px 8px', borderRadius: '100px'
                   }}>DONE</div>
                 )}
@@ -321,9 +321,9 @@ export default function Onboarding({
                 fontSize: '12px', fontWeight: 700, letterSpacing: '1px',
                 cursor: canStart ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px',
-                background: canStart ? 'linear-gradient(135deg, #22C55E 0%, #3B82F6 100%)' : 'rgba(255,255,255,0.03)',
+                background: canStart ? 'linear-gradient(135deg, #3B82F6 0%, #3B82F6 100%)' : 'rgba(255,255,255,0.03)',
                 color: canStart ? '#fff' : 'rgba(255,255,255,0.12)',
-                boxShadow: canStart ? '0 6px 30px rgba(34,197,94,0.35), inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
+                boxShadow: canStart ? '0 6px 30px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
                 transition: 'all 0.25s ease'
               }}
             >
@@ -338,11 +338,11 @@ export default function Onboarding({
                 onClick={enterContest}
                 style={{
                   width: '100%', padding: '14px', borderRadius: '13px',
-                  border: canPayEntry ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(255,255,255,0.04)',
+                  border: canPayEntry ? '1px solid rgba(59,130,246,0.25)' : '1px solid rgba(255,255,255,0.04)',
                   fontSize: '12px', fontWeight: 600,
                   cursor: canPayEntry ? 'pointer' : 'not-allowed',
-                  background: canPayEntry ? 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.08))' : 'rgba(255,255,255,0.02)',
-                  color: canPayEntry ? '#4ADE80' : 'rgba(255,255,255,0.12)',
+                  background: canPayEntry ? 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.08))' : 'rgba(255,255,255,0.02)',
+                  color: canPayEntry ? '#60A5FA' : 'rgba(255,255,255,0.12)',
                   transition: 'all 0.25s ease'
                 }}
               >
@@ -351,9 +351,9 @@ export default function Onboarding({
             ) : (
               <div style={{
                 width: '100%', padding: '14px', borderRadius: '13px',
-                border: '1px solid rgba(34,197,94,0.18)',
+                border: '1px solid rgba(59,130,246,0.18)',
                 fontSize: '12px', fontWeight: 600, textAlign: 'center',
-                background: 'rgba(34,197,94,0.05)', color: '#4ADE80',
+                background: 'rgba(59,130,246,0.05)', color: '#60A5FA',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -387,7 +387,7 @@ export default function Onboarding({
 
             <div style={{
               textAlign: 'center', fontSize: '10px', paddingTop: '2px',
-              color: canStart ? '#4ADE80' : 'rgba(255,255,255,0.18)', fontWeight: 500
+              color: canStart ? '#60A5FA' : 'rgba(255,255,255,0.18)', fontWeight: 500
             }}>
               {canStart ? 'All set. You are ready to play.'
                 : !userAddress ? 'Connect your wallet to get started'
