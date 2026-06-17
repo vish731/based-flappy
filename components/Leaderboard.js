@@ -66,7 +66,7 @@ export default function Leaderboard() {
   }
 
   // talent.app style — single accent color, no rainbow ranks
-  const ACCENT = '#22C55E' // green
+  const ACCENT = '#3B82F6' // green
 
   function PlayerRow({ player, i, prize }) {
     const name = player.username || shortAddr(player.wallet_address)
@@ -92,8 +92,8 @@ export default function Leaderboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
             width: '34px', height: '34px', borderRadius: '50%',
-            background: isTop3 ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.05)',
-            border: isTop3 ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(255,255,255,0.08)',
+            background: isTop3 ? 'rgba(59,130,246,0.12)' : 'rgba(255,255,255,0.05)',
+            border: isTop3 ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.08)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '13px', fontWeight: 700,
             color: isTop3 ? ACCENT : 'rgba(255,255,255,0.4)',
@@ -119,7 +119,7 @@ export default function Leaderboard() {
             {player.total_score || 0}
           </div>
           {prize > 0 && (
-            <div style={{ fontSize: '10px', color: 'rgba(34,197,94,0.55)', marginTop: '2px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(59,130,246,0.55)', marginTop: '2px' }}>
               {prize.toFixed(5)} ETH
             </div>
           )}
@@ -136,7 +136,7 @@ export default function Leaderboard() {
       {/* Prize Pool — minimal black-green */}
       <div style={{
         background: '#0B0E0C',
-        border: '1px solid rgba(34,197,94,0.12)',
+        border: '1px solid rgba(59,130,246,0.12)',
         borderRadius: '14px', padding: '20px 24px',
         marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         flexWrap: 'wrap', gap: '16px'
