@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { SoundEngine } from '@/lib/sound'
 import { supabase, getWeekNumber } from '@/lib/supabase'
 
@@ -116,11 +116,11 @@ function getThemeColors(isDark) {
 // ════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ════════════════════════════════════════════════════════════
-export default function Game({
+const Game = forwardRef(function Game({
   hasEntered, userAddress, theme,
   onGameOver, onShowOnboarding,
   totalScore, setTotalScore
-}) {
+}, ref) {
   const canvasRef = useRef(null)
   const stateRef = useRef({
     bird: { x: 80, y: 300, velocity: 0, rotation: 0 },
@@ -485,11 +485,16 @@ export default function Game({
   function handleCanvasInteract() {
     const s = stateRef.current
     if (!hasEntered) { onShowOnboarding(); return }
+    if (s.isDead) { return } // wait for GameOver modal's Play Again
     if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
     else jump()
   }
 
   // ── Exposed start/restart (called from parent) ────────────
+  useImperativeHandle(ref, () => ({
+    restart: () => initGame()
+  }))
+
   useEffect(() => {
     if (hasEntered) { initGame() }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -508,10 +513,10 @@ export default function Game({
       >
         <canvas
           ref={canvasRef}
-          width={400} height={600}
+          width={400} height={560}
           onClick={handleCanvasInteract}
           onTouchStart={(e) => { e.preventDefault(); handleCanvasInteract() }}
-          style={{ cursor: 'pointer', touchAction: 'none' }}
+          style={{ cursor: 'pointer', touchAction: 'none', maxHeight: '70vh', width: 'auto', height: 'auto' }}
         />
       </div>
 
@@ -548,5 +553,6 @@ export default function Game({
       </div>
     </div>
   )
-}
+})
 
+export default Game
