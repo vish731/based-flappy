@@ -353,11 +353,11 @@ const Game = forwardRef(function Game({
     ctx.fillStyle = themeRef.current === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)'
     ctx.fillRect(0, 0, W, H)
     ctx.font = 'bold 28px Orbitron, sans-serif'; ctx.textAlign = 'center'
-    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#22C55E'; ctx.shadowBlur = 20
+    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#3B82F6'; ctx.shadowBlur = 20
     ctx.fillText('BASED-FLAPPY', W / 2, H / 2 - 50); ctx.shadowBlur = 0
     ctx.font = '500 13px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.6)'
     ctx.fillText('Enter contest to play', W / 2, H / 2 - 15)
-    ctx.font = '600 12px Inter, sans-serif'; ctx.fillStyle = 'rgba(34,197,94,0.9)'
+    ctx.font = '600 12px Inter, sans-serif'; ctx.fillStyle = 'rgba(59,130,246,0.9)'
     ctx.globalAlpha = (Math.sin(frame * 0.05) + 1) * 0.3 + 0.5
     ctx.fillText('↓ START GAME below ↓', W / 2, H / 2 + 20)
     ctx.globalAlpha = 1; ctx.restore()
@@ -369,7 +369,7 @@ const Game = forwardRef(function Game({
     ctx.fillStyle = themeRef.current === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'
     ctx.fillRect(0, 0, W, H)
     ctx.font = 'bold 32px Orbitron, sans-serif'; ctx.textAlign = 'center'
-    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#22C55E'; ctx.shadowBlur = 20
+    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#3B82F6'; ctx.shadowBlur = 20
     ctx.fillText('BASED-FLAPPY', W / 2, H / 2 - 40); ctx.shadowBlur = 0
     ctx.font = '500 16px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.7)'
     ctx.globalAlpha = (Math.sin(frame * 0.05) + 1) * 0.3 + 0.4
@@ -531,8 +531,8 @@ const Game = forwardRef(function Game({
           style={{
             flex: 1, border: 'none', padding: '14px 24px', borderRadius: '13px',
             fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: 'linear-gradient(135deg, #22C55E, #3B82F6)', color: 'white',
-            boxShadow: '0 4px 15px rgba(34,197,94,0.35)', transition: 'all 0.25s ease'
+            background: 'linear-gradient(135deg, #3B82F6, #2563EB)', color: 'white',
+            boxShadow: '0 4px 15px rgba(59,130,246,0.35)', transition: 'all 0.25s ease'
           }}
         >
           START GAME
@@ -542,9 +542,9 @@ const Game = forwardRef(function Game({
           style={{
             flex: 1, border: '1px solid var(--border)', padding: '14px 24px',
             borderRadius: '13px', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: hasEntered ? 'rgba(34,197,94,0.12)' : 'var(--input-bg)',
+            background: hasEntered ? 'rgba(59,130,246,0.12)' : 'var(--input-bg)',
             color: hasEntered ? 'var(--primary)' : 'var(--text)',
-            borderColor: hasEntered ? 'rgba(34,197,94,0.25)' : 'var(--border)',
+            borderColor: hasEntered ? 'rgba(59,130,246,0.25)' : 'var(--border)',
             transition: 'all 0.25s ease'
           }}
         >
