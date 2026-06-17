@@ -1,13 +1,13 @@
 'use client'
 
 export default function Docs() {
-  const ACCENT = '#22C55E'
+  const ACCENT = '#3B82F6'
 
   return (
     <div style={{
       maxWidth: '780px', margin: '32px auto 0',
       background: '#0B0E0C',
-      border: '1px solid rgba(34,197,94,0.12)',
+      border: '1px solid rgba(59,130,246,0.12)',
       borderRadius: '20px', padding: '32px',
       animation: 'fadeInUp 0.6s ease'
     }}>
@@ -31,8 +31,8 @@ export default function Docs() {
             ].map(item => (
               <div key={item.rank} style={{
                 flex: 1, minWidth: '100px', textAlign: 'center',
-                background: 'rgba(34,197,94,0.04)',
-                border: '1px solid rgba(34,197,94,0.15)',
+                background: 'rgba(59,130,246,0.04)',
+                border: '1px solid rgba(59,130,246,0.15)',
                 borderRadius: '12px', padding: '16px 10px'
               }}>
                 <div style={{ fontSize: '22px', fontWeight: 800, color: ACCENT }}>{item.pct}</div>
@@ -79,7 +79,7 @@ export default function Docs() {
         </Section>
 
         <div style={{
-          background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.12)',
+          background: 'rgba(59,130,246,0.03)', border: '1px solid rgba(59,130,246,0.12)',
           borderRadius: '14px', padding: '20px'
         }}>
           <div style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: '12px' }}>Support & Community</div>
