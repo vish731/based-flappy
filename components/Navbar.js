@@ -142,7 +142,7 @@ export default function Navbar({ activeTab, setActiveTab, userAddress, theme, to
           >
             <span style={{
               width: '6px', height: '6px', borderRadius: '50%',
-              background: userAddress ? '#22C55E' : 'var(--text-muted)',
+              background: userAddress ? '#3B82F6' : 'var(--text-muted)',
               animation: userAddress ? 'pulse 2s infinite' : 'none'
             }} />
             <span>
