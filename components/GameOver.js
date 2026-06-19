@@ -44,7 +44,7 @@ export default function GameOver({ show, currentScore, totalScore, onRestart, on
               This Game
             </div>
             <div style={{
-              fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 800,
+              fontFamily: "'Inter', sans-serif", fontSize: '28px', fontWeight: 800,
               color: 'var(--primary)'
             }}>
               {currentScore}
@@ -58,7 +58,7 @@ export default function GameOver({ show, currentScore, totalScore, onRestart, on
               Your Total
             </div>
             <div style={{
-              fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 800,
+              fontFamily: "'Inter', sans-serif", fontSize: '28px', fontWeight: 800,
               color: 'var(--gold)'
             }}>
               {totalScore}
