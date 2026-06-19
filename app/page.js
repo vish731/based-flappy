@@ -161,7 +161,7 @@ export default function Home() {
       background: 'rgba(239,68,68,0.12)', padding: '3px 7px',
       borderRadius: '6px', color: '#F87171', minWidth: '32px',
       textAlign: 'center', lineHeight: 1.4,
-      fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: '12px'
+      fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: '12px'
     }}>{val}</span>
   )
 
@@ -197,7 +197,7 @@ export default function Home() {
                 <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
                 <span>Entry: 0.00005 ETH</span>
                 <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
-                <span>Prize: <span style={{ color: 'var(--gold)', fontWeight: 700, fontFamily: "'Orbitron', sans-serif", fontSize: '11px' }}>{prizePool.toFixed(5)}</span> ETH</span>
+                <span>Prize: <span style={{ color: 'var(--gold)', fontWeight: 700, fontFamily: "'Inter', sans-serif", fontSize: '11px' }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
               <div style={{
                 background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.08))',
