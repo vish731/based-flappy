@@ -205,7 +205,7 @@ export default function Onboarding({
                 Weekly Prize Pool
               </div>
               <div style={{
-                fontFamily: "'Orbitron', sans-serif", fontSize: '28px', fontWeight: 900,
+                fontFamily: "'Inter', sans-serif", fontSize: '28px', fontWeight: 900,
                 color: '#3B82F6', textShadow: '0 0 40px rgba(59,130,246,0.4)', marginBottom: '6px'
               }}>
                 {prizePool.toFixed(5)} ETH
@@ -217,11 +217,11 @@ export default function Onboarding({
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: '8px', padding: '5px 12px', marginBottom: '14px'
               }}>
-                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>{totalEntries} entries</span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Inter', sans-serif" }}>{totalEntries} entries</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>×</span>
-                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>0.00005 ETH</span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Inter', sans-serif" }}>0.00005 ETH</span>
                 <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>=</span>
-                <span style={{ fontSize: '9px', color: '#3B82F6', fontWeight: 700, fontFamily: 'monospace' }}>{prizePool.toFixed(5)} ETH</span>
+                <span style={{ fontSize: '9px', color: '#3B82F6', fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>{prizePool.toFixed(5)} ETH</span>
               </div>
 
               <div style={{ display: 'flex', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -231,7 +231,7 @@ export default function Onboarding({
                   { pct: '10%', label: '3rd Place', color: '#EF4444', glow: 'rgba(239,68,68,0.2)' },
                 ].map((item, i) => (
                   <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                    <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '16px', fontWeight: 800, color: item.color, textShadow: '0 0 20px ' + item.glow }}>{item.pct}</div>
+                    <div style={{ fontFamily: "'Inter', sans-serif", fontSize: '16px', fontWeight: 800, color: item.color, textShadow: '0 0 20px ' + item.glow }}>{item.pct}</div>
                     <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.25)', marginTop: '3px', fontWeight: 500 }}>{item.label}</div>
                   </div>
                 ))}
