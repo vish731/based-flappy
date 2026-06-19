@@ -69,7 +69,7 @@ class ScorePopup {
     ctx.save()
     ctx.globalAlpha = this.life
     ctx.fillStyle = '#FFD700'
-    ctx.font = 'bold 24px Orbitron, sans-serif'
+    ctx.font = 'bold 24px Inter, sans-serif'
     ctx.textAlign = 'center'
     ctx.shadowColor = '#FFD700'
     ctx.shadowBlur = 10
@@ -338,7 +338,7 @@ const Game = forwardRef(function Game({
     ctx.save()
     ctx.fillStyle = themeRef.current === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)'
     roundRect(ctx, W / 2 - 40, 20, 80, 55, 16); ctx.fill()
-    ctx.font = 'bold 36px Orbitron, sans-serif'; ctx.textAlign = 'center'
+    ctx.font = 'bold 36px Inter, sans-serif'; ctx.textAlign = 'center'
     ctx.fillStyle = '#FFF'; ctx.shadowColor = '#3B82F6'; ctx.shadowBlur = 10
     ctx.fillText(s.currentScore, W / 2, 60); ctx.shadowBlur = 0
     ctx.font = '600 11px Inter, sans-serif'
