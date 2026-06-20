@@ -57,7 +57,6 @@ export default function Leaderboard() {
   const tabs = [
     { key: 'weekly', label: 'This Week' },
     { key: 'alltime', label: 'All Time' },
-    { key: 'winners', label: 'Past Winners' },
   ]
 
   function shortAddr(addr) {
@@ -102,10 +101,6 @@ export default function Leaderboard() {
           </div>
           <div>
             <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{name}</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-              {player.games_played || 0} games
-              {player.weeks_played > 1 && ` · ${player.weeks_played} weeks`}
-            </div>
           </div>
         </div>
 
@@ -199,35 +194,10 @@ export default function Leaderboard() {
         weeklyPlayers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)', fontSize: '13px' }}>No players yet this week</div>
         ) : weeklyPlayers.map((p, i) => <PlayerRow key={i} player={p} i={i} prize={prizes[i] || 0} />)
-      ) : activeTab === 'alltime' ? (
+      ) : (
         allTimePlayers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)', fontSize: '13px' }}>No data yet</div>
         ) : allTimePlayers.map((p, i) => <PlayerRow key={i} player={p} i={i} prize={0} />)
-      ) : (
-        winners.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)', fontSize: '13px' }}>No winners yet</div>
-        ) : winners.map((w, i) => (
-          <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-              Week {w.week_number}
-            </div>
-            {[
-              { addr: w.winner1_address, amount: w.winner1_amount, rank: '1st' },
-              { addr: w.winner2_address, amount: w.winner2_amount, rank: '2nd' },
-              { addr: w.winner3_address, amount: w.winner3_amount, rank: '3rd' },
-            ].filter(x => x.addr).map((item, j) => (
-              <div key={j} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '11px', color: ACCENT, fontWeight: 700, width: '28px' }}>{item.rank}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{shortAddr(item.addr)}</span>
-                </div>
-                <span style={{ fontSize: '12px', color: ACCENT, fontWeight: 700 }}>
-                  {item.amount?.toFixed(5)} ETH
-                </span>
-              </div>
-            ))}
-          </div>
-        ))
       )}
     </div>
   )
