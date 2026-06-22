@@ -514,7 +514,7 @@ const Game = forwardRef(function Game({
       >
         <canvas
           ref={canvasRef}
-          width={400} height={580}
+          width={400} height={460}
           onClick={handleCanvasInteract}
           onTouchStart={(e) => { e.preventDefault(); handleCanvasInteract() }}
           style={{
