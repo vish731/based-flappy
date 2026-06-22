@@ -7,6 +7,7 @@ export const metadata = {
     'base:app_id': '6a167c313b7a47b352a5e374'
   }
 }
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="dark">
