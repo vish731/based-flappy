@@ -501,27 +501,32 @@ const Game = forwardRef(function Game({
   }, [])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0 8px' }}>
       {/* Game canvas wrapper */}
       <div
         id="gameWrapper"
         style={{
-          background: 'var(--bg-card)', borderRadius: '24px', padding: '12px',
-          marginBottom: '18px', border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow)', maxWidth: '100%'
+          background: 'var(--bg-card)', borderRadius: '20px', padding: '8px',
+          marginBottom: '14px', border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)', width: '100%', maxWidth: '460px',
+          boxSizing: 'border-box'
         }}
       >
         <canvas
           ref={canvasRef}
-          width={400} height={560}
+          width={400} height={580}
           onClick={handleCanvasInteract}
           onTouchStart={(e) => { e.preventDefault(); handleCanvasInteract() }}
-          style={{ cursor: 'pointer', touchAction: 'none', maxHeight: '70vh', width: 'auto', height: 'auto' }}
+          style={{
+            cursor: 'pointer', touchAction: 'none',
+            width: '100%', height: 'auto',
+            display: 'block', borderRadius: '14px'
+          }}
         />
       </div>
 
       {/* Buttons */}
-      <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '424px' }}>
+      <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '460px' }}>
         <button
           onClick={() => {
             SoundEngine.play('click')
