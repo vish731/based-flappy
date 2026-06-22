@@ -177,7 +177,7 @@ export default function Home() {
         toggleSound={toggleSound}
       />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '88px 20px 40px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '72px 12px 40px' }}>
 
         {activeTab === 'game' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
