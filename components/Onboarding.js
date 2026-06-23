@@ -6,7 +6,7 @@ import {
   getProvider, hasProvider, isMobileDevice,
   detectWalletName, getDeepLinks,
   checkNetwork, switchToBase,
-  PRIZE_WALLET, ENTRY_FEE_HEX, BASE_CHAIN_ID
+  PRIZE_WALLET, ENTRY_FEE_HEX, BASE_CHAIN_ID, BUILDER_SUFFIX
 } from '@/lib/wallet'
 import { supabase, getWeekNumber } from '@/lib/supabase'
 
@@ -71,13 +71,14 @@ export default function Onboarding({
     try {
       const p = getProvider()
 
-      // Simple direct ETH transfer — 0.00005 ETH to prize wallet
+      // Direct ETH transfer with ERC-8021 Builder Code attribution
       const txHash = await p.request({
         method: 'eth_sendTransaction',
         params: [{
           from: userAddress,
           to: PRIZE_WALLET,
-          value: ENTRY_FEE_HEX,  // 0x2d79883d2000 = 0.00005 ETH
+          value: ENTRY_FEE_HEX,      // 0.00005 ETH
+          data: BUILDER_SUFFIX,      // ERC-8021 builder code attribution
           chainId: BASE_CHAIN_ID
         }]
       })
@@ -290,7 +291,7 @@ export default function Onboarding({
               fontSize: '10px', color: 'rgba(255,255,255,0.25)',
               lineHeight: 1.7, textAlign: 'center'
             }}>
-              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.00005 ETH</span> on Base mainnet.
+              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.00005 ETH</span> via the BasedFlappy prize pool contract on Base.
               Non-refundable. Score only counts after entry.
             </div>
           </div>
