@@ -163,13 +163,15 @@ const Game = forwardRef(function Game({
       if (e.code !== 'Space') return
       e.preventDefault()
       const s = stateRef.current
-      if (!hasEntered) { onShowOnboarding(); return }
+      // Only show onboarding if game is NOT running and NOT in freePlay
+      if (!hasEntered && !freePlay && !s.gameRunning) { onShowOnboarding(); return }
+      if (!hasEntered && !freePlay) return // game running but not entered — ignore
       if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
       else jump()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [hasEntered, jump, onShowOnboarding])
+  }, [hasEntered, freePlay, jump, onShowOnboarding])
 
   // ── Init game ────────────────────────────────────────────
   function initGame() {
