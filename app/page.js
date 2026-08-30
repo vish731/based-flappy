@@ -42,6 +42,7 @@ export default function Home() {
   const [lastScore, setLastScore] = useState(0)
   const [prizePool, setPrizePool] = useState(0)
   const [countdown, setCountdown] = useState(getCountdown())
+  const [freePlay, setFreePlay] = useState(false)
 
   const [soundMsg, setSoundMsg] = useState('')
   const [soundMsgVisible, setSoundMsgVisible] = useState(false)
@@ -216,9 +217,42 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Mode Selector */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', width: '100%', maxWidth: '460px' }}>
+              <button
+                onClick={() => { setFreePlay(false); setShowOnboarding(true) }}
+                style={{
+                  flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
+                  fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                  background: !freePlay ? 'linear-gradient(135deg, #FF2D78, #8B5CF6)' : 'rgba(255,255,255,0.04)',
+                  color: !freePlay ? '#fff' : 'rgba(255,255,255,0.4)',
+                  border: !freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: !freePlay ? '0 4px 20px rgba(255,45,120,0.3)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                🏆 Contest Mode
+              </button>
+              <button
+                onClick={() => { setFreePlay(true); setShowOnboarding(false) }}
+                style={{
+                  flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
+                  fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                  background: freePlay ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(255,255,255,0.04)',
+                  color: freePlay ? '#fff' : 'rgba(255,255,255,0.4)',
+                  border: freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: freePlay ? '0 4px 20px rgba(34,197,94,0.3)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                🎮 Free Play
+              </button>
+            </div>
+
             <Game
               ref={gameRef}
               hasEntered={hasEntered}
+              freePlay={freePlay}
               userAddress={userAddress}
               theme={theme}
               onGameOver={handleGameOver}
