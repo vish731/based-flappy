@@ -92,7 +92,7 @@ export default function Home() {
         .select('wallet_address')
         .eq('week_number', wk)
       if (!error && data) {
-        setPrizePool(data.length * 0.00005)
+        setPrizePool(data.length * 0.000125)
       }
     } catch (e) {}
   }
@@ -197,7 +197,7 @@ export default function Home() {
                   fontWeight: 700, color: '#60A5FA'
                 }}>⬤ Base</span>
                 <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.00005 ETH</span></span>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.000125 ETH</span></span>
                 <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Prize: <span style={{ color: '#FF2D78', fontWeight: 700 }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
