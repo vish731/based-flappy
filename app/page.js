@@ -185,7 +185,7 @@ export default function Home() {
             {/* Info Bar */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <div style={{
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                background: 'var(--bg-card)', border: '1px solid var(--border)',
                 borderRadius: '14px', padding: '10px 18px', fontSize: '13px',
                 display: 'flex', alignItems: 'center', gap: '12px',
                 backdropFilter: 'blur(10px)'
@@ -197,7 +197,7 @@ export default function Home() {
                   fontWeight: 700, color: '#60A5FA'
                 }}>⬤ Base</span>
                 <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.000125 ETH</span></span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.000125 ETH</span></span>
                 <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Prize: <span style={{ color: '#FF2D78', fontWeight: 700 }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
@@ -225,13 +225,13 @@ export default function Home() {
                   flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
                   fontSize: '12px', fontWeight: 700, cursor: 'pointer',
                   background: !freePlay ? 'linear-gradient(135deg, #FF2D78, #8B5CF6)' : 'rgba(255,255,255,0.04)',
-                  color: !freePlay ? '#fff' : 'rgba(255,255,255,0.4)',
+                  color: !freePlay ? '#fff' : 'var(--text-muted)',
                   border: !freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
                   boxShadow: !freePlay ? '0 4px 20px rgba(255,45,120,0.3)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
-                🏆 Contest Mode
+                Contest Mode
               </button>
               <button
                 onClick={() => { setFreePlay(true); setShowOnboarding(false) }}
@@ -239,13 +239,13 @@ export default function Home() {
                   flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
                   fontSize: '12px', fontWeight: 700, cursor: 'pointer',
                   background: freePlay ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(255,255,255,0.04)',
-                  color: freePlay ? '#fff' : 'rgba(255,255,255,0.4)',
+                  color: freePlay ? '#fff' : 'var(--text-muted)',
                   border: freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
                   boxShadow: freePlay ? '0 4px 20px rgba(34,197,94,0.3)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
-                🎮 Free Play
+                Free Play
               </button>
             </div>
 
