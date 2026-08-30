@@ -44,18 +44,22 @@
 }
 
 [data-theme="light"] {
-  --bg: #F0F0F7;
-  --bg2: #E8E8F0;
-  --nav-bg: rgba(240,240,247,0.9);
-  --card: rgba(255,255,255,0.8);
+  --bg: #F4F4F8;
+  --bg2: #EAEAF0;
+  --nav-bg: rgba(244,244,248,0.92);
+  --card: rgba(255,255,255,0.9);
   --card-border: rgba(0,0,0,0.08);
   --text: #0a0a12;
-  --text-muted: rgba(10,10,18,0.5);
+  --text-muted: rgba(10,10,18,0.55);
   --border: rgba(0,0,0,0.1);
   --input-bg: rgba(0,0,0,0.05);
-  --bg-card: rgba(255,255,255,0.8);
+  --bg-card: rgba(255,255,255,0.9);
   --bg-card-solid: #ffffff;
-  --shadow: 0 25px 60px rgba(0,0,0,0.15);
+  --shadow: 0 25px 60px rgba(0,0,0,0.12);
+  --primary: #d4185e;
+  --primary-glow: rgba(212,24,94,0.3);
+  --accent: #7c3aed;
+  --gold: #d4185e;
 }
 
 html, body {
@@ -66,27 +70,9 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Animated background */
-body::before {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(255,45,120,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-body > * { position: relative; z-index: 1; }
-
 /* Nav links */
 .nav-link {
-  color: var(--text2);
+  color: var(--text-muted);
   font-size: 13px;
   font-weight: 600;
   padding: 7px 14px;
@@ -97,15 +83,10 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: 0.2px;
   border: 1px solid transparent;
 }
-.nav-link:hover {
-  color: var(--text);
-  background: rgba(255,255,255,0.06);
-}
-.nav-link.active {
-  color: var(--text);
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.12);
-}
+.nav-link:hover { color: var(--text); background: rgba(0,0,0,0.04); }
+[data-theme="dark"] .nav-link:hover { background: rgba(255,255,255,0.06); }
+.nav-link.active { color: var(--text); background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.08); }
+[data-theme="dark"] .nav-link.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.12); }
 
 /* Leaderboard rows */
 .leaderboard-item {
