@@ -53,7 +53,7 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
       await new Promise(r => setTimeout(r, 3000))
       setHasEntered(true); SoundEngine.play('success')
       try {
-        await supabase.from('entries').insert({ wallet_address: userAddress, tx_hash: txHash, week_number: getWeekNumber(), amount_eth: 0.00005 })
+        await supabase.from('entries').insert({ wallet_address: userAddress, tx_hash: txHash, week_number: getWeekNumber(), amount_eth: 0.000125 })
       } catch (e) {}
       setWalletStatus('Entry confirmed!')
     } catch (e) {
@@ -63,7 +63,7 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
 
   const canStart = userAddress && isOnBase && hasEntered
   const canPayEntry = userAddress && isOnBase && !hasEntered
-  const totalEntries = prizePool > 0 ? Math.round(prizePool / 0.00005) : 0
+  const totalEntries = prizePool > 0 ? Math.round(prizePool / 0.000125) : 0
 
   return (
     <div onClick={(e) => { if (e.target === e.currentTarget) onClose() }} style={{
@@ -113,10 +113,10 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
                 {prizePool.toFixed(5)} ETH
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '4px 12px', marginBottom: '14px' }}>
-                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{totalEntries} entries × 0.00005 ETH</span>
+                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{totalEntries} entries × 0.000125 ETH</span>
               </div>
               <div style={{ display: 'flex', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                {[['50%','1st','#FF2D78'],['40%','2nd','rgba(255,255,255,0.8)'],['10%','3rd','#8B5CF6']].map(([pct,label,color],i) => (
+                {[['60%','1st','#FF2D78'],['40%','2nd','rgba(255,255,255,0.8)']].map(([pct,label,color],i) => (
                   <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i<2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
                     <div style={{ fontSize: '17px', fontWeight: 800, color }}>{pct}</div>
                     <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '3px' }}>{label} Place</div>
@@ -131,7 +131,7 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
             <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '12px' }}>Entry Steps</div>
             {[
               { num: '1', label: 'Connect your wallet', done: !!userAddress },
-              { num: '2', label: 'Pay 0.00005 ETH entry fee', done: hasEntered },
+              { num: '2', label: 'Pay 0.000125 ETH entry fee', done: hasEntered },
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: i < 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
                 <div style={{
@@ -155,7 +155,7 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
           {/* Note */}
           <div style={{ padding: '12px 24px 0' }}>
             <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '10px 14px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', lineHeight: 1.7, textAlign: 'center' }}>
-              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.00005 ETH</span> on Base mainnet · Non-refundable
+              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.000125 ETH</span> on Base mainnet · Non-refundable
             </div>
           </div>
 
@@ -185,7 +185,7 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
                 color: canPayEntry ? '#60A5FA' : 'rgba(255,255,255,0.15)',
                 transition: 'all 0.2s ease'
               }}>
-                {payingEntry ? 'Processing...' : 'Pay & Enter — 0.00005 ETH'}
+                {payingEntry ? 'Processing...' : 'Pay & Enter — 0.000125 ETH'}
               </button>
             ) : (
               <div style={{ width: '100%', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255,45,120,0.2)', background: 'rgba(255,45,120,0.06)', color: '#FF2D78', fontSize: '13px', fontWeight: 700, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
