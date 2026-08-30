@@ -158,10 +158,10 @@ export default function Home() {
 
   const timerBlock = (val) => (
     <span style={{
-      background: 'rgba(239,68,68,0.12)', padding: '3px 7px',
-      borderRadius: '6px', color: '#F87171', minWidth: '32px',
+      background: 'rgba(255,45,120,0.12)', padding: '4px 10px',
+      borderRadius: '8px', color: '#FF2D78', minWidth: '36px',
       textAlign: 'center', lineHeight: 1.4,
-      fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: '12px'
+      fontWeight: 800, fontSize: '13px', letterSpacing: '0.5px'
     }}>{val}</span>
   )
 
@@ -177,40 +177,40 @@ export default function Home() {
         toggleSound={toggleSound}
       />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '72px 12px 40px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '76px 12px 40px' }}>
 
         {activeTab === 'game' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* Badges */}
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '18px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {/* Info Bar */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <div style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: '12px', padding: '10px 16px', fontSize: '12px',
-                display: 'flex', alignItems: 'center', gap: '10px', backdropFilter: 'blur(10px)'
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '14px', padding: '10px 18px', fontSize: '13px',
+                display: 'flex', alignItems: 'center', gap: '12px',
+                backdropFilter: 'blur(10px)'
               }}>
                 <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '5px',
-                  background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)',
-                  borderRadius: '8px', padding: '4px 10px', fontSize: '10px',
-                  fontWeight: 600, color: 'var(--primary)'
-                }}>🔵 Base</span>
-                <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
-                <span>Entry: 0.00005 ETH</span>
-                <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
-                <span>Prize: <span style={{ color: 'var(--gold)', fontWeight: 700, fontFamily: "'Inter', sans-serif", fontSize: '11px' }}>{prizePool.toFixed(5)}</span> ETH</span>
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)',
+                  borderRadius: '8px', padding: '4px 10px', fontSize: '11px',
+                  fontWeight: 700, color: '#60A5FA'
+                }}>⬤ Base</span>
+                <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.00005 ETH</span></span>
+                <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Prize: <span style={{ color: '#FF2D78', fontWeight: 700 }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
               <div style={{
-                background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.08))',
-                border: '1px solid rgba(239,68,68,0.15)', borderRadius: '12px',
-                padding: '10px 16px', fontSize: '12px',
+                background: 'rgba(255,45,120,0.06)', border: '1px solid rgba(255,45,120,0.15)',
+                borderRadius: '14px', padding: '10px 18px', fontSize: '12px',
                 display: 'flex', alignItems: 'center', gap: '10px'
               }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: 500 }}>Ends in</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', fontWeight: 600 }}>Ends in</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                   {timerBlock(countdown.days + 'd')}
-                  <span style={{ color: 'rgba(239,68,68,0.4)', fontSize: '10px' }}>:</span>
+                  <span style={{ color: 'rgba(255,45,120,0.4)', fontSize: '10px', fontWeight: 700 }}>:</span>
                   {timerBlock(countdown.hours + 'h')}
-                  <span style={{ color: 'rgba(239,68,68,0.4)', fontSize: '10px' }}>:</span>
+                  <span style={{ color: 'rgba(255,45,120,0.4)', fontSize: '10px', fontWeight: 700 }}>:</span>
                   {timerBlock(countdown.mins + 'm')}
                 </div>
               </div>
