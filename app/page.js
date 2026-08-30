@@ -49,18 +49,15 @@ export default function Home() {
   const soundTimerRef = useRef(null)
   const gameRef = useRef(null)
 
-  // Theme
+  // Theme — always dark
   useEffect(() => {
-    const saved = localStorage.getItem('theme') || 'dark'
-    setTheme(saved)
-    document.documentElement.setAttribute('data-theme', saved)
+    setTheme('dark')
+    document.documentElement.setAttribute('data-theme', 'dark')
+    localStorage.setItem('theme', 'dark')
   }, [])
 
   function toggleTheme() {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('theme', next)
+    // Dark mode only — no toggle
     SoundEngine.play('click')
   }
 
