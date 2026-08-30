@@ -119,7 +119,8 @@ function getThemeColors(isDark) {
 const Game = forwardRef(function Game({
   hasEntered, userAddress, theme,
   onGameOver, onShowOnboarding,
-  totalScore, setTotalScore
+  totalScore, setTotalScore,
+  freePlay
 }, ref) {
   const canvasRef = useRef(null)
   const stateRef = useRef({
@@ -353,13 +354,14 @@ const Game = forwardRef(function Game({
     ctx.fillStyle = themeRef.current === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)'
     ctx.fillRect(0, 0, W, H)
     ctx.font = 'bold 28px Orbitron, sans-serif'; ctx.textAlign = 'center'
-    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#3B82F6'; ctx.shadowBlur = 20
+    ctx.fillStyle = '#FFF'; ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 20
     ctx.fillText('BASED-FLAPPY', W / 2, H / 2 - 50); ctx.shadowBlur = 0
     ctx.font = '500 13px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.6)'
-    ctx.fillText('Enter contest to play', W / 2, H / 2 - 15)
-    ctx.font = '600 12px Inter, sans-serif'; ctx.fillStyle = 'rgba(59,130,246,0.9)'
+    ctx.fillText(freePlay ? 'Free Play Mode' : 'Enter contest to play', W / 2, H / 2 - 15)
+    ctx.font = '600 12px Inter, sans-serif'
+    ctx.fillStyle = freePlay ? 'rgba(34,197,94,0.9)' : 'rgba(255,45,120,0.9)'
     ctx.globalAlpha = (Math.sin(frame * 0.05) + 1) * 0.3 + 0.5
-    ctx.fillText('↓ START GAME below ↓', W / 2, H / 2 + 20)
+    ctx.fillText(freePlay ? '↓ TAP TO PLAY ↓' : '↓ START GAME below ↓', W / 2, H / 2 + 20)
     ctx.globalAlpha = 1; ctx.restore()
   }
 
@@ -484,8 +486,8 @@ const Game = forwardRef(function Game({
   // ── Canvas click/touch ───────────────────────────────────
   function handleCanvasInteract() {
     const s = stateRef.current
-    if (!hasEntered) { onShowOnboarding(); return }
-    if (s.isDead) { return } // wait for GameOver modal's Play Again
+    if (!hasEntered && !freePlay) { onShowOnboarding(); return }
+    if (s.isDead) { return }
     if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
     else jump()
   }
@@ -496,7 +498,7 @@ const Game = forwardRef(function Game({
   }))
 
   useEffect(() => {
-    if (hasEntered) { initGame() }
+    if (hasEntered || freePlay) { initGame() }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -530,26 +532,30 @@ const Game = forwardRef(function Game({
         <button
           onClick={() => {
             SoundEngine.play('click')
-            if (!hasEntered) { onShowOnboarding(); return }
+            if (!hasEntered && !freePlay) { onShowOnboarding(); return }
             initGame()
           }}
           style={{
             flex: 1, border: 'none', padding: '14px 24px', borderRadius: '13px',
             fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: 'linear-gradient(135deg, #3B82F6, #2563EB)', color: 'white',
-            boxShadow: '0 4px 15px rgba(59,130,246,0.35)', transition: 'all 0.25s ease'
+            background: freePlay
+              ? 'linear-gradient(135deg, #22C55E, #16A34A)'
+              : 'linear-gradient(135deg, #FF2D78, #8B5CF6)',
+            color: 'white',
+            boxShadow: freePlay ? '0 4px 15px rgba(34,197,94,0.35)' : '0 4px 15px rgba(255,45,120,0.35)',
+            transition: 'all 0.25s ease'
           }}
         >
-          START GAME
+          {freePlay ? 'FREE PLAY' : 'START GAME'}
         </button>
         <button
           onClick={() => { SoundEngine.play('click'); onShowOnboarding() }}
           style={{
-            flex: 1, border: '1px solid var(--border)', padding: '14px 24px',
+            flex: 1, border: '1px solid rgba(255,255,255,0.08)', padding: '14px 24px',
             borderRadius: '13px', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: hasEntered ? 'rgba(59,130,246,0.12)' : 'var(--input-bg)',
-            color: hasEntered ? 'var(--primary)' : 'var(--text)',
-            borderColor: hasEntered ? 'rgba(59,130,246,0.25)' : 'var(--border)',
+            background: hasEntered ? 'rgba(255,45,120,0.1)' : 'rgba(255,255,255,0.04)',
+            color: hasEntered ? '#FF2D78' : 'rgba(255,255,255,0.6)',
+            borderColor: hasEntered ? 'rgba(255,45,120,0.25)' : 'rgba(255,255,255,0.08)',
             transition: 'all 0.25s ease'
           }}
         >
