@@ -20,7 +20,7 @@ export default function Docs() {
               content: (
                 <div>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
-                    {[['50%','1st Place','#FF2D78'],['40%','2nd Place','rgba(255,255,255,0.7)'],['10%','3rd Place','#8B5CF6']].map(([pct,label,color],i) => (
+                    {[['60%','1st Place','#FF2D78'],['40%','2nd Place','rgba(255,255,255,0.7)']].map(([pct,label,color],i) => (
                       <div key={i} style={{ flex:1, minWidth:'90px', textAlign:'center', background:'rgba(255,255,255,0.03)', border:`1px solid rgba(255,255,255,0.08)`, borderRadius:'12px', padding:'14px 8px' }}>
                         <div style={{ fontSize:'22px', fontWeight:800, color }}>{pct}</div>
                         <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.3)', marginTop:'4px' }}>{label}</div>
@@ -28,7 +28,7 @@ export default function Docs() {
                     ))}
                   </div>
                   <div style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px', padding:'12px 16px', fontSize:'12px', color:'rgba(255,255,255,0.4)', lineHeight:1.8 }}>
-                    Formula: <span style={{color:'#FF2D78', fontWeight:600}}>Total Entries × 0.00005 ETH</span><br/>
+                    Formula: <span style={{color:'#FF2D78', fontWeight:600}}>Total Entries × 0.000125 ETH</span><br/>
                     Rewards transferred within 24 hours after Sunday.
                   </div>
                 </div>
@@ -41,7 +41,7 @@ export default function Docs() {
                 <ol style={{ paddingLeft:'18px', color:'rgba(255,255,255,0.4)', fontSize:'13px', lineHeight:2.1 }}>
                   <li>Connect your wallet (MetaMask, Coinbase Wallet, or any EVM wallet)</li>
                   <li>Make sure you are on <b style={{color:'#fff'}}>Base Mainnet</b> (Chain ID: 8453)</li>
-                  <li>Pay <b style={{color:'#fff'}}>0.00005 ETH</b> entry fee — goes to prize pool</li>
+                  <li>Pay <b style={{color:'#fff'}}>0.000125 ETH</b> entry fee — goes to prize pool</li>
                   <li>Play all week — your total score counts</li>
                 </ol>
               )
