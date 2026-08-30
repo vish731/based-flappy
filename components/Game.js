@@ -143,14 +143,18 @@ const Game = forwardRef(function Game({
   })
   const totalScoreRef = useRef(totalScore)
   const themeRef = useRef(theme)
+  const freePlayRef = useRef(freePlay)
+  const hasEnteredRef = useRef(hasEntered)
 
   useEffect(() => { totalScoreRef.current = totalScore }, [totalScore])
   useEffect(() => { themeRef.current = theme }, [theme])
+  useEffect(() => { freePlayRef.current = freePlay }, [freePlay])
+  useEffect(() => { hasEnteredRef.current = hasEntered }, [hasEntered])
 
   // ── Jump ─────────────────────────────────────────────────
   const jump = useCallback(() => {
     const s = stateRef.current
-    if (!s.gameRunning || !hasEntered) return
+    if (!s.gameRunning || (!hasEnteredRef.current && !freePlayRef.current)) return
     s.bird.velocity = CONFIG.jumpForce
     SoundEngine.play('flap')
     for (let i = 0; i < 5; i++)
@@ -163,15 +167,16 @@ const Game = forwardRef(function Game({
       if (e.code !== 'Space') return
       e.preventDefault()
       const s = stateRef.current
-      // Only show onboarding if game is NOT running and NOT in freePlay
-      if (!hasEntered && !freePlay && !s.gameRunning) { onShowOnboarding(); return }
-      if (!hasEntered && !freePlay) return // game running but not entered — ignore
+      const entered = hasEnteredRef.current
+      const fp = freePlayRef.current
+      if (!entered && !fp && !s.gameRunning) { onShowOnboarding(); return }
+      if (!entered && !fp) return
       if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
       else jump()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [hasEntered, freePlay, jump, onShowOnboarding])
+  }, [jump, onShowOnboarding])
 
   // ── Init game ────────────────────────────────────────────
   function initGame() {
@@ -488,7 +493,9 @@ const Game = forwardRef(function Game({
   // ── Canvas click/touch ───────────────────────────────────
   function handleCanvasInteract() {
     const s = stateRef.current
-    if (!hasEntered && !freePlay) { onShowOnboarding(); return }
+    const entered = hasEnteredRef.current
+    const fp = freePlayRef.current
+    if (!entered && !fp) { onShowOnboarding(); return }
     if (s.isDead) { return }
     if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
     else jump()
