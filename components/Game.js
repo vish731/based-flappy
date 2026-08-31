@@ -171,6 +171,9 @@ const Game = forwardRef(function Game({
       const fp = freePlayRef.current
       if (!entered && !fp && !s.gameRunning) { onShowOnboarding(); return }
       if (!entered && !fp) return
+      // Restart on space after death
+      if (s.isDead && s.showRestartHint) { initGame(); return }
+      if (s.isDead) return
       if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
       else jump()
     }
@@ -186,12 +189,14 @@ const Game = forwardRef(function Game({
     s.frameCount = 0; s.wingAngle = 0
     s.screenShake = { x: 0, y: 0, intensity: 0 }
     s.flashAlpha = 0; s.currentScore = 0
-    s.gameRunning = true; s.gameStarted = false; s.isDead = false
+    s.gameRunning = true; s.gameStarted = false; s.isDead = false; s.showRestartHint = false
   }
 
   // ── Submit score ─────────────────────────────────────────
   async function submitScore(score) {
-    if (!userAddress || !hasEntered || score === 0) return
+    // Don't save score in free play mode
+    if (freePlayRef.current) return
+    if (!userAddress || !hasEnteredRef.current || score === 0) return
     try {
       const wk = getWeekNumber()
       const un = userAddress.slice(0, 8)
@@ -230,6 +235,8 @@ const Game = forwardRef(function Game({
     setTimeout(async () => {
       await submitScore(s.currentScore)
       onGameOver(s.currentScore, totalScoreRef.current)
+      // Show tap to restart after 600ms
+      s.showRestartHint = true
     }, 800)
   }
 
@@ -472,7 +479,26 @@ const Game = forwardRef(function Game({
       if (!s.isDead) drawBird(ctx, s)
       if (s.gameRunning && s.gameStarted) drawScore(ctx, s, W)
       else if (s.gameRunning && !s.gameStarted) drawStartScreen(ctx, W, H, s.frameCount)
-      else if (!s.gameRunning && !s.isDead && !hasEntered) drawIdleScreen(ctx, W, H, s.frameCount)
+      else if (!s.gameRunning && !s.isDead && !hasEnteredRef.current && !freePlayRef.current) drawIdleScreen(ctx, W, H, s.frameCount)
+
+      // Tap to restart hint after death
+      if (s.isDead && s.showRestartHint) {
+        ctx.save()
+        ctx.fillStyle = 'rgba(0,0,0,0.45)'
+        ctx.fillRect(0, 0, W, H)
+        ctx.font = 'bold 28px Orbitron, sans-serif'; ctx.textAlign = 'center'
+        ctx.fillStyle = '#FFF'; ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 20
+        ctx.fillText('GAME OVER', W / 2, H / 2 - 40); ctx.shadowBlur = 0
+        ctx.font = '700 14px Inter, sans-serif'
+        ctx.fillStyle = '#FF2D78'
+        ctx.globalAlpha = (Math.sin(s.frameCount * 0.08) + 1) * 0.3 + 0.5
+        ctx.fillText('TAP TO PLAY AGAIN', W / 2, H / 2 + 10)
+        ctx.globalAlpha = 1
+        ctx.font = '500 12px Inter, sans-serif'
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'
+        ctx.fillText('Score: ' + s.currentScore, W / 2, H / 2 + 40)
+        ctx.restore()
+      }
 
       // Flash
       if (s.flashAlpha > 0) {
@@ -496,6 +522,7 @@ const Game = forwardRef(function Game({
     const entered = hasEnteredRef.current
     const fp = freePlayRef.current
     if (!entered && !fp) { onShowOnboarding(); return }
+    if (s.isDead && s.showRestartHint) { initGame(); return }
     if (s.isDead) { return }
     if (s.gameRunning && !s.gameStarted) { s.gameStarted = true; jump() }
     else jump()
