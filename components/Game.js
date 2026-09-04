@@ -6,8 +6,8 @@ import { supabase, getWeekNumber } from '@/lib/supabase'
 
 // ── Game Config ──────────────────────────────────────────────
 const CONFIG = {
-  gravity: 0.14,
-  jumpForce: -5.2,
+  gravity: 0.07,
+  jumpForce: -2.6,
   pipeSpeed: 3,
   pipeGap: 160,
   pipeWidth: 60,
