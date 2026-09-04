@@ -371,7 +371,7 @@ const Game = forwardRef(function Game({
     ctx.fillStyle = '#FFF'; ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 20
     ctx.fillText('BASED-FLAPPY', W / 2, H / 2 - 50); ctx.shadowBlur = 0
     ctx.font = '500 13px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.6)'
-    ctx.fillText(freePlay ? 'Free Play Mode' : 'Enter contest to play', W / 2, H / 2 - 15)
+    ctx.fillText(freePlay ? 'Normal Mode' : 'Enter contest to play', W / 2, H / 2 - 15)
     ctx.font = '600 12px Inter, sans-serif'
     ctx.fillStyle = freePlay ? 'rgba(34,197,94,0.9)' : 'rgba(255,45,120,0.9)'
     ctx.globalAlpha = (Math.sin(frame * 0.05) + 1) * 0.3 + 0.5
@@ -582,7 +582,7 @@ const Game = forwardRef(function Game({
             transition: 'all 0.25s ease'
           }}
         >
-          {freePlay ? 'FREE PLAY' : 'START GAME'}
+          {freePlay ? 'NORMAL MODE' : 'START GAME'}
         </button>
         <button
           onClick={() => { SoundEngine.play('click'); onShowOnboarding() }}
