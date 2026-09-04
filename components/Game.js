@@ -9,7 +9,7 @@ const CONFIG = {
   gravity: 0.07,
   jumpForce: -2.6,
   pipeSpeed: 3,
-  pipeGap: 160,
+  pipeGap: 120,
   pipeWidth: 60,
   pipeSpawnRate: 85,
   birdSize: 14,
@@ -438,7 +438,7 @@ const Game = forwardRef(function Game({
             s.frameCount++
             // Spawn pipe
             if (s.frameCount > CONFIG.pipeSpawnRate) {
-              const t = 80, b = H - CONFIG.pipeGap - 140
+              const t = 40, b = H - CONFIG.pipeGap - 40
               const h = Math.random() * (b - t) + t
               s.pipes.push({ x: W, topHeight: h, bottomY: h + CONFIG.pipeGap, passed: false })
               s.frameCount = 0
