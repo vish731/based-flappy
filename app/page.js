@@ -242,7 +242,7 @@ export default function Home() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                Free Play
+                Normal Mode
               </button>
             </div>
 
