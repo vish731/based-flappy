@@ -62,9 +62,21 @@ export default function Docs() {
           ))}
 
           <div style={{ background:'rgba(255,45,120,0.04)', border:'1px solid rgba(255,45,120,0.12)', borderRadius:'16px', padding:'20px' }}>
-            <div style={{ fontSize:'13px', fontWeight:700, color:'var(--text)', marginBottom:'12px' }}>Support & Community</div>
-            <p style={{ fontSize:'13px', color:'var(--text-muted)', marginBottom:'6px' }}>Telegram: <a href="https://t.me/gojo0204hm" target="_blank" rel="noreferrer" style={{color:'#FF2D78', textDecoration:'none', fontWeight:600}}>@gojo0204hm</a></p>
-            <p style={{ fontSize:'13px', color:'var(--text-muted)', marginBottom:'14px' }}>Twitter: <a href="https://twitter.com/gojo0204hm" target="_blank" rel="noreferrer" style={{color:'#FF2D78', textDecoration:'none', fontWeight:600}}>@gojo0204hm</a></p>
+            <div style={{ fontSize:'13px', fontWeight:700, color:'var(--text)', marginBottom:'14px' }}>Support & Community</div>
+            <div style={{ display:'flex', gap:'10px', marginBottom:'14px' }}>
+              <a href="https://t.me/gojo0204hm" target="_blank" rel="noreferrer" style={{ textDecoration:'none', flex:1 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'12px', padding:'12px', cursor:'pointer' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#2AABEE"/><path d="M5 11.5l13-5-2 11-5-3-3 3 1-5 6-5.5-7 4.5-3-1z" fill="white"/></svg>
+                  <span style={{ fontSize:'12px', fontWeight:600, color:'rgba(255,255,255,0.7)' }}>Telegram</span>
+                </div>
+              </a>
+              <a href="https://twitter.com/gojo0204hm" target="_blank" rel="noreferrer" style={{ textDecoration:'none', flex:1 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'12px', padding:'12px', cursor:'pointer' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#000"/><path d="M17.5 7h-1.9l-3.1 3.6L9.4 7H6l4.7 6.1L6.1 18H8l3.4-3.9 3.2 3.9H18l-4.9-6.3L17.5 7z" fill="white"/></svg>
+                  <span style={{ fontSize:'12px', fontWeight:600, color:'rgba(255,255,255,0.7)' }}>Twitter / X</span>
+                </div>
+              </a>
+            </div>
             <p style={{ fontSize:'11px', color:'var(--text-muted)' }}>BASED-FLAPPY is experimental. Play responsibly. Entry fees are non-refundable.</p>
           </div>
         </div>
