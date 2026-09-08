@@ -94,12 +94,46 @@ export default function Home() {
     } catch (e) {}
   }
 
+  const [username, setUsername] = useState('')
+  const [usernameInput, setUsernameInput] = useState('')
+  const [savingUsername, setSavingUsername] = useState(false)
+
   // Check entry status from Supabase when wallet connects
   useEffect(() => {
     if (!userAddress) return
     checkEntryStatus()
     loadTotalScore()
+    loadUsername()
   }, [userAddress])
+
+  async function loadUsername() {
+    try {
+      const { data } = await supabase
+        .from('scores')
+        .select('username')
+        .eq('wallet_address', userAddress)
+        .not('username', 'is', null)
+        .limit(1)
+        .single()
+      if (data?.username) {
+        setUsername(data.username)
+        setUsernameInput(data.username)
+      }
+    } catch (e) {}
+  }
+
+  async function saveUsername() {
+    if (!usernameInput.trim() || !userAddress) return
+    setSavingUsername(true)
+    try {
+      await supabase
+        .from('scores')
+        .update({ username: usernameInput.trim() })
+        .eq('wallet_address', userAddress)
+      setUsername(usernameInput.trim())
+    } catch (e) {}
+    setSavingUsername(false)
+  }
 
   async function checkEntryStatus() {
     try {
@@ -261,6 +295,48 @@ export default function Home() {
             {walletStatus && (
               <div style={{ marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}
                 dangerouslySetInnerHTML={{ __html: walletStatus }} />
+            )}
+
+            {/* Username setter — show only when wallet connected */}
+            {userAddress && (
+              <div style={{
+                marginTop: '14px', width: '100%', maxWidth: '460px',
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '14px', padding: '14px 16px',
+                display: 'flex', alignItems: 'center', gap: '10px'
+              }}>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap', fontWeight: 600 }}>
+                  {username ? '✓ Name:' : 'Set name:'}
+                </div>
+                <input
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value.slice(0, 20))}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveUsername() }}
+                  placeholder="Your display name..."
+                  maxLength={20}
+                  style={{
+                    flex: 1, background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px', padding: '7px 12px',
+                    fontSize: '12px', color: '#fff', outline: 'none',
+                    fontFamily: "'Space Grotesk', sans-serif"
+                  }}
+                />
+                <button
+                  onClick={saveUsername}
+                  disabled={savingUsername || !usernameInput.trim()}
+                  style={{
+                    padding: '7px 14px', borderRadius: '8px', border: 'none',
+                    fontSize: '11px', fontWeight: 700, cursor: 'pointer',
+                    background: 'linear-gradient(135deg, #FF2D78, #8B5CF6)',
+                    color: '#fff', whiteSpace: 'nowrap',
+                    opacity: !usernameInput.trim() ? 0.4 : 1
+                  }}
+                >
+                  {savingUsername ? '...' : 'Save'}
+                </button>
+              </div>
             )}
 
             {userAddress && !isOnBase && (
