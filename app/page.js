@@ -20,7 +20,7 @@ function getCountdown() {
   let diff = end - now
   if (diff < 1000) { end.setDate(end.getDate() + 7); diff = end - now }
   return {
-    days: Math.floor(diff / 8640000),
+    days: Math.floor(diff / 86400000),
     hours: String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0'),
     mins: String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0'),
   }
