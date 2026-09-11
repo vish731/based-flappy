@@ -13,7 +13,7 @@ import { SoundEngine } from '@/lib/sound'
 function getCountdown() {
   const now = new Date()
   const day = now.getDay()
-  const daysUntilSun = day === 0 ? 0 : 7 - 
+  const daysUntilSun = day === 0 ? 0 : 7 - day
   const end = new Date(now)
   end.setDate(now.getDate() + daysUntilSun)
   end.setHours(23, 59, 59, 999)
