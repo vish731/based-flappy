@@ -572,14 +572,12 @@ const Game = forwardRef(function Game({
             initGame()
           }}
           style={{
-            flex: 1, border: 'none', padding: '14px 24px', borderRadius: '13px',
-            fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: freePlay
-              ? 'linear-gradient(135deg, #22C55E, #16A34A)'
-              : 'linear-gradient(135deg, #FF2D78, #8B5CF6)',
-            color: 'white',
-            boxShadow: freePlay ? '0 4px 15px rgba(34,197,94,0.35)' : '0 4px 15px rgba(255,45,120,0.35)',
-            transition: 'all 0.25s ease'
+            flex: 1, padding: '14px 24px', borderRadius: '100px',
+            fontSize: '13px', fontWeight: 800, cursor: 'pointer',
+            background: '#1DB954',
+            color: 'white', border: '2px solid #1a1a1a',
+            boxShadow: '3px 3px 0px #1a1a1a',
+            transition: 'all 0.15s ease', letterSpacing: '0.5px'
           }}
         >
           {freePlay ? 'NORMAL MODE' : 'START GAME'}
@@ -587,12 +585,13 @@ const Game = forwardRef(function Game({
         <button
           onClick={() => { SoundEngine.play('click'); onShowOnboarding() }}
           style={{
-            flex: 1, border: '1px solid rgba(255,255,255,0.08)', padding: '14px 24px',
-            borderRadius: '13px', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-            background: hasEntered ? 'rgba(255,45,120,0.1)' : 'rgba(255,255,255,0.04)',
-            color: hasEntered ? '#FF2D78' : 'rgba(255,255,255,0.6)',
-            borderColor: hasEntered ? 'rgba(255,45,120,0.25)' : 'rgba(255,255,255,0.08)',
-            transition: 'all 0.25s ease'
+            flex: 1, padding: '14px 24px', borderRadius: '100px',
+            fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+            background: hasEntered ? '#e8f9ef' : '#fff',
+            color: hasEntered ? '#1DB954' : '#555',
+            border: hasEntered ? '2px solid #1DB954' : '2px solid #1a1a1a',
+            boxShadow: '2px 2px 0px #1a1a1a',
+            transition: 'all 0.15s ease'
           }}
         >
           {hasEntered ? '✓ ENTERED' : 'PAY & ENTER'}
