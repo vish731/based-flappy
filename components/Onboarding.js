@@ -36,11 +36,6 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
     } finally { setConnecting(false) }
   }
 
-  async function handleSwitchToBase() {
-    const { switchToBase: sb } = await import('@/lib/wallet')
-    await sb(); const onBase = await checkNetwork(); setIsOnBase(onBase)
-  }
-
   async function enterContest() {
     if (!userAddress || hasEntered || !isOnBase) return
     setPayingEntry(true); SoundEngine.play('click')
@@ -52,13 +47,16 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
       })
       await new Promise(r => setTimeout(r, 3000))
       setHasEntered(true); SoundEngine.play('success')
-      try {
-        await supabase.from('entries').insert({ wallet_address: userAddress, tx_hash: txHash, week_number: getWeekNumber(), amount_eth: 0.000125 })
-      } catch (e) {}
+      try { await supabase.from('entries').insert({ wallet_address: userAddress, tx_hash: txHash, week_number: getWeekNumber(), amount_eth: 0.000125 }) } catch (e) {}
       setWalletStatus('Entry confirmed!')
     } catch (e) {
       setWalletStatus(e.code === 4001 ? 'Cancelled.' : 'Failed.')
     } finally { setPayingEntry(false) }
+  }
+
+  async function handleSwitchToBase() {
+    await switchToBase()
+    const onBase = await checkNetwork(); setIsOnBase(onBase)
   }
 
   const canStart = userAddress && isOnBase && hasEntered
@@ -68,58 +66,38 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
   return (
     <div onClick={(e) => { if (e.target === e.currentTarget) onClose() }} style={{
       position: 'fixed', inset: 0, zIndex: 5000,
-      background: 'rgba(5,5,8,0.85)',
-      backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+      background: 'rgba(0,0,0,0.4)',
+      backdropFilter: 'blur(8px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
     }}>
       <div style={{ width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
         <div style={{
-          background: '#0a0a12',
-          border: '1px solid rgba(255,45,120,0.2)',
-          borderRadius: '24px', overflow: 'hidden',
-          boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 40px 80px rgba(0,0,0,0.8)'
+          background: '#fff', borderRadius: '24px',
+          border: '2px solid #1a1a1a',
+          boxShadow: '6px 6px 0px #1a1a1a',
+          overflow: 'hidden'
         }}>
-          {/* Top gradient bar */}
-          <div style={{ height: '2px', background: 'linear-gradient(90deg, #FF2D78, #8B5CF6, #3B82F6)' }} />
-
           {/* Header */}
-          <div style={{ padding: '28px 24px 0', textAlign: 'center' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '7px',
-              background: 'rgba(255,45,120,0.08)', border: '1px solid rgba(255,45,120,0.2)',
-              padding: '5px 14px', borderRadius: '100px', marginBottom: '20px'
-            }}>
-              <span style={{ width: '6px', height: '6px', background: '#FF2D78', borderRadius: '50%', boxShadow: '0 0 8px #FF2D78', animation: 'pulse 1.5s infinite' }} />
-              <span style={{ fontSize: '9px', fontWeight: 700, color: '#FF2D78', textTransform: 'uppercase', letterSpacing: '2px' }}>Live Contest</span>
+          <div style={{ background: '#1DB954', padding: '24px', textAlign: 'center', borderBottom: '2px solid #1a1a1a' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(0,0,0,0.15)', padding: '5px 14px', borderRadius: '100px', marginBottom: '14px' }}>
+              <span style={{ width: '6px', height: '6px', background: '#FF2D78', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
+              <span style={{ fontSize: '9px', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '2px' }}>Live Contest</span>
             </div>
-            <div style={{
-              fontFamily: "'Orbitron', sans-serif", fontSize: '22px', fontWeight: 900,
-              background: 'linear-gradient(90deg, #FF2D78, #8B5CF6, #3B82F6)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              marginBottom: '6px', letterSpacing: '1px'
-            }}>BASED-FLAPPY</div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.3px' }}>Rank higher. Win more.</div>
+            <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '22px', fontWeight: 900, color: '#fff', marginBottom: '4px', letterSpacing: '1px' }}>BASED-FLAPPY</div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>Rank higher. Win more.</div>
           </div>
 
           {/* Prize Pool */}
-          <div style={{ padding: '20px 24px 0' }}>
-            <div style={{
-              background: 'rgba(255,45,120,0.04)', border: '1px solid rgba(255,45,120,0.12)',
-              borderRadius: '16px', padding: '18px', textAlign: 'center', position: 'relative', overflow: 'hidden'
-            }}>
-              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(255,45,120,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '8px' }}>Weekly Prize Pool</div>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: '#FF2D78', textShadow: '0 0 30px rgba(255,45,120,0.5)', marginBottom: '6px' }}>
-                {prizePool.toFixed(5)} ETH
-              </div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '4px 12px', marginBottom: '14px' }}>
-                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{totalEntries} entries × 0.000125 ETH</span>
-              </div>
-              <div style={{ display: 'flex', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                {[['60%','1st','#FF2D78'],['40%','2nd','rgba(255,255,255,0.8)']].map(([pct,label,color],i) => (
-                  <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i<2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                    <div style={{ fontSize: '17px', fontWeight: 800, color }}>{pct}</div>
-                    <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '3px' }}>{label} Place</div>
+          <div style={{ padding: '20px', borderBottom: '2px solid #f0f0eb' }}>
+            <div style={{ background: '#F5F5F0', border: '2px solid #1a1a1a', borderRadius: '16px', padding: '16px', textAlign: 'center', boxShadow: '3px 3px 0px #1a1a1a' }}>
+              <div style={{ fontSize: '9px', color: '#999', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '8px' }}>Weekly Prize Pool</div>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: '#1DB954', marginBottom: '4px' }}>{prizePool.toFixed(5)} ETH</div>
+              <div style={{ fontSize: '11px', color: '#999', marginBottom: '12px' }}>{totalEntries} entries × 0.000125 ETH</div>
+              <div style={{ display: 'flex', borderTop: '2px solid #e5e5e0', paddingTop: '12px' }}>
+                {[['60%','1st','#1DB954'],['40%','2nd','#0066FF']].map(([pct,label,color],i) => (
+                  <div key={i} style={{ flex:1, textAlign:'center', borderRight: i===0 ? '2px solid #e5e5e0' : 'none' }}>
+                    <div style={{ fontSize:'18px', fontWeight:900, color }}>{pct}</div>
+                    <div style={{ fontSize:'10px', color:'#999', marginTop:'2px', fontWeight:600 }}>{label} Place</div>
                   </div>
                 ))}
               </div>
@@ -127,87 +105,79 @@ export default function Onboarding({ show, onClose, prizePool, userAddress, setU
           </div>
 
           {/* Steps */}
-          <div style={{ padding: '18px 24px 0' }}>
-            <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '12px' }}>Entry Steps</div>
+          <div style={{ padding: '16px 20px' }}>
+            <div style={{ fontSize: '9px', color: '#999', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '12px' }}>Entry Steps</div>
             {[
               { num: '1', label: 'Connect your wallet', done: !!userAddress },
               { num: '2', label: 'Pay 0.000125 ETH entry fee', done: hasEntered },
             ].map((step, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: i < 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'10px 0', borderBottom: i<1 ? '2px solid #f0f0eb' : 'none' }}>
                 <div style={{
-                  width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0,
-                  background: step.done ? 'rgba(255,45,120,0.15)' : 'rgba(255,255,255,0.04)',
-                  border: step.done ? '1px solid rgba(255,45,120,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: step.done ? '0 0 12px rgba(255,45,120,0.2)' : 'none'
+                  width:'28px', height:'28px', borderRadius:'8px', flexShrink:0,
+                  background: step.done ? '#1DB954' : '#fff',
+                  border: '2px solid #1a1a1a',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  boxShadow: '2px 2px 0px #1a1a1a'
                 }}>
                   {step.done
-                    ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FF2D78" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                    : <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>{step.num}</span>
+                    ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    : <span style={{ fontSize:'11px', color:'#999', fontWeight:700 }}>{step.num}</span>
                   }
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: 500, color: step.done ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.35)' }}>{step.label}</span>
-                {step.done && <div style={{ marginLeft: 'auto', fontSize: '9px', color: '#FF2D78', fontWeight: 700, background: 'rgba(255,45,120,0.1)', border: '1px solid rgba(255,45,120,0.2)', padding: '2px 8px', borderRadius: '100px' }}>DONE</div>}
+                <span style={{ fontSize:'13px', fontWeight:600, color: step.done ? '#1a1a1a' : '#999' }}>{step.label}</span>
+                {step.done && <div style={{ marginLeft:'auto', fontSize:'9px', color:'#1DB954', fontWeight:700, background:'#e8f9ef', padding:'2px 8px', borderRadius:'100px', border:'1px solid #1DB954' }}>DONE</div>}
               </div>
             ))}
           </div>
 
           {/* Note */}
-          <div style={{ padding: '12px 24px 0' }}>
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '10px 14px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', lineHeight: 1.7, textAlign: 'center' }}>
-              Entry fee is <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>0.000125 ETH</span> on Base mainnet · Non-refundable
+          <div style={{ padding: '0 20px 16px' }}>
+            <div style={{ background:'#F5F5F0', border:'2px solid #e5e5e0', borderRadius:'10px', padding:'10px 14px', fontSize:'11px', color:'#999', textAlign:'center' }}>
+              0.000125 ETH on Base mainnet · Non-refundable
             </div>
           </div>
 
           {/* Buttons */}
-          <div style={{ padding: '14px 24px 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {/* START GAME */}
+          <div style={{ padding: '0 20px 20px', display:'flex', flexDirection:'column', gap:'8px' }}>
             <button disabled={!canStart} onClick={() => { SoundEngine.play('click'); onStart() }} style={{
-              width: '100%', padding: '14px', borderRadius: '14px', border: 'none',
-              fontSize: '13px', fontWeight: 800, letterSpacing: '1px', cursor: canStart ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              background: canStart ? 'linear-gradient(135deg, #FF2D78, #8B5CF6)' : 'rgba(255,255,255,0.04)',
-              color: canStart ? '#fff' : 'rgba(255,255,255,0.15)',
-              boxShadow: canStart ? '0 8px 30px rgba(255,45,120,0.4)' : 'none',
-              transition: 'all 0.2s ease', textTransform: 'uppercase'
-            }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Start Game
-            </button>
+              width:'100%', padding:'14px', borderRadius:'14px',
+              border: '2px solid #1a1a1a', fontSize:'13px', fontWeight:800,
+              cursor: canStart ? 'pointer' : 'not-allowed',
+              background: canStart ? '#1DB954' : '#f0f0eb',
+              color: canStart ? '#fff' : '#ccc',
+              boxShadow: canStart ? '3px 3px 0px #1a1a1a' : 'none',
+              letterSpacing:'0.5px', textTransform:'uppercase'
+            }}>Start Game</button>
 
-            {/* PAY & ENTER */}
             {!hasEntered ? (
               <button disabled={!canPayEntry || payingEntry} onClick={enterContest} style={{
-                width: '100%', padding: '14px', borderRadius: '14px',
-                border: canPayEntry ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.05)',
-                fontSize: '13px', fontWeight: 700, cursor: canPayEntry ? 'pointer' : 'not-allowed',
-                background: canPayEntry ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.02)',
-                color: canPayEntry ? '#60A5FA' : 'rgba(255,255,255,0.15)',
-                transition: 'all 0.2s ease'
-              }}>
-                {payingEntry ? 'Processing...' : 'Pay & Enter — 0.000125 ETH'}
-              </button>
+                width:'100%', padding:'14px', borderRadius:'14px',
+                border:'2px solid #1a1a1a', fontSize:'13px', fontWeight:700,
+                cursor: canPayEntry ? 'pointer' : 'not-allowed',
+                background: canPayEntry ? '#0066FF' : '#f0f0eb',
+                color: canPayEntry ? '#fff' : '#ccc',
+                boxShadow: canPayEntry ? '3px 3px 0px #1a1a1a' : 'none'
+              }}>{payingEntry ? 'Processing...' : 'Pay & Enter — 0.000125 ETH'}</button>
             ) : (
-              <div style={{ width: '100%', padding: '14px', borderRadius: '14px', border: '1px solid rgba(255,45,120,0.2)', background: 'rgba(255,45,120,0.06)', color: '#FF2D78', fontSize: '13px', fontWeight: 700, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                Entered — Ready to play
+              <div style={{ width:'100%', padding:'14px', borderRadius:'14px', border:'2px solid #1DB954', background:'#e8f9ef', color:'#1DB954', fontSize:'13px', fontWeight:700, textAlign:'center' }}>
+                Entered — Ready to play!
               </div>
             )}
 
             {userAddress && !isOnBase && (
-              <button onClick={() => { const {switchToBase: sb} = require('@/lib/wallet'); sb().then(() => checkNetwork().then(setIsOnBase)) }} style={{ width: '100%', padding: '12px', borderRadius: '14px', border: '1px solid rgba(59,130,246,0.15)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', background: 'rgba(59,130,246,0.06)', color: 'rgba(96,165,250,0.7)' }}>
+              <button onClick={handleSwitchToBase} style={{ width:'100%', padding:'12px', borderRadius:'14px', border:'2px solid #1a1a1a', fontSize:'12px', fontWeight:600, cursor:'pointer', background:'#fff', boxShadow:'2px 2px 0px #1a1a1a' }}>
                 Switch to Base Network
               </button>
             )}
 
             {!userAddress && (
-              <button disabled={connecting} onClick={connectWallet} style={{ width: '100%', padding: '12px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)' }}>
+              <button disabled={connecting} onClick={connectWallet} style={{ width:'100%', padding:'12px', borderRadius:'14px', border:'2px solid #1a1a1a', fontSize:'12px', fontWeight:600, cursor:'pointer', background:'#fff', boxShadow:'2px 2px 0px #1a1a1a' }}>
                 {connecting ? 'Connecting...' : 'Connect Wallet'}
               </button>
             )}
 
-            <div style={{ textAlign: 'center', fontSize: '10px', color: canStart ? '#FF2D78' : 'rgba(255,255,255,0.2)', fontWeight: 500 }}>
-              {canStart ? 'All set. Start playing!' : !userAddress ? 'Connect wallet to begin' : !isOnBase ? 'Switch to Base network' : 'Pay entry fee to unlock'}
+            <div style={{ textAlign:'center', fontSize:'11px', color: canStart ? '#1DB954' : '#999', fontWeight:600 }}>
+              {canStart ? 'All set — start playing!' : !userAddress ? 'Connect wallet to begin' : !isOnBase ? 'Switch to Base network' : 'Pay entry fee to unlock'}
             </div>
           </div>
         </div>
