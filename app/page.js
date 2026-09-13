@@ -49,15 +49,14 @@ export default function Home() {
   const soundTimerRef = useRef(null)
   const gameRef = useRef(null)
 
-  // Theme — always dark
+  // Theme — always light
   useEffect(() => {
-    setTheme('dark')
-    document.documentElement.setAttribute('data-theme', 'dark')
-    localStorage.setItem('theme', 'dark')
+    setTheme('light')
+    document.documentElement.setAttribute('data-theme', 'light')
+    localStorage.setItem('theme', 'light')
   }, [])
 
   function toggleTheme() {
-    // Dark mode only — no toggle
     SoundEngine.play('click')
   }
 
@@ -190,10 +189,11 @@ export default function Home() {
 
   const timerBlock = (val) => (
     <span style={{
-      background: 'rgba(255,45,120,0.12)', padding: '4px 10px',
-      borderRadius: '8px', color: '#FF2D78', minWidth: '36px',
+      background: '#FF2D78', padding: '4px 10px',
+      borderRadius: '8px', color: '#fff', minWidth: '36px',
       textAlign: 'center', lineHeight: 1.4,
-      fontWeight: 800, fontSize: '13px', letterSpacing: '0.5px'
+      fontWeight: 800, fontSize: '13px', border: '2px solid #1a1a1a',
+      boxShadow: '2px 2px 0px #1a1a1a'
     }}>{val}</span>
   )
 
@@ -209,40 +209,41 @@ export default function Home() {
         toggleSound={toggleSound}
       />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '76px 12px 40px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '80px 16px 40px' }}>
 
         {activeTab === 'game' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* Info Bar */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <div style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: '14px', padding: '10px 18px', fontSize: '13px',
+                background: '#fff', border: '2px solid #1a1a1a',
+                borderRadius: '100px', padding: '10px 20px', fontSize: '13px',
                 display: 'flex', alignItems: 'center', gap: '12px',
-                backdropFilter: 'blur(10px)'
+                boxShadow: '3px 3px 0px #1a1a1a'
               }}>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)',
-                  borderRadius: '8px', padding: '4px 10px', fontSize: '11px',
-                  fontWeight: 700, color: '#60A5FA'
+                  background: '#e8f4ff', border: '1px solid #0066FF',
+                  borderRadius: '100px', padding: '4px 10px', fontSize: '11px',
+                  fontWeight: 700, color: '#0066FF'
                 }}>⬤ Base</span>
-                <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
-                <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Entry: <span style={{ color: '#fff', fontWeight: 600 }}>0.000125 ETH</span></span>
-                <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)' }} />
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Prize: <span style={{ color: '#FF2D78', fontWeight: 700 }}>{prizePool.toFixed(5)}</span> ETH</span>
+                <span style={{ width: '1px', height: '16px', background: '#e5e5e0' }} />
+                <span style={{ color: '#555', fontSize: '12px' }}>Entry: <span style={{ color: '#0D0D0D', fontWeight: 700 }}>0.000125 ETH</span></span>
+                <span style={{ width: '1px', height: '16px', background: '#e5e5e0' }} />
+                <span style={{ color: '#555', fontSize: '12px' }}>Prize: <span style={{ color: '#1DB954', fontWeight: 800 }}>{prizePool.toFixed(5)}</span> ETH</span>
               </div>
               <div style={{
-                background: 'rgba(255,45,120,0.06)', border: '1px solid rgba(255,45,120,0.15)',
-                borderRadius: '14px', padding: '10px 18px', fontSize: '12px',
-                display: 'flex', alignItems: 'center', gap: '10px'
+                background: '#fff', border: '2px solid #1a1a1a',
+                borderRadius: '100px', padding: '10px 20px', fontSize: '12px',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                boxShadow: '3px 3px 0px #1a1a1a'
               }}>
-                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', fontWeight: 600 }}>Ends in</span>
+                <span style={{ color: '#555', fontSize: '11px', fontWeight: 600 }}>Ends in</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                   {timerBlock(countdown.days + 'd')}
-                  <span style={{ color: 'rgba(255,45,120,0.4)', fontSize: '10px', fontWeight: 700 }}>:</span>
+                  <span style={{ color: '#ccc', fontSize: '12px', fontWeight: 700 }}>:</span>
                   {timerBlock(countdown.hours + 'h')}
-                  <span style={{ color: 'rgba(255,45,120,0.4)', fontSize: '10px', fontWeight: 700 }}>:</span>
+                  <span style={{ color: '#ccc', fontSize: '12px', fontWeight: 700 }}>:</span>
                   {timerBlock(countdown.mins + 'm')}
                 </div>
               </div>
@@ -253,13 +254,12 @@ export default function Home() {
               <button
                 onClick={() => { setFreePlay(false); setShowOnboarding(true) }}
                 style={{
-                  flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
-                  fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                  background: !freePlay ? 'linear-gradient(135deg, #FF2D78, #8B5CF6)' : 'rgba(255,255,255,0.04)',
-                  color: !freePlay ? '#fff' : 'var(--text-muted)',
-                  border: !freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: !freePlay ? '0 4px 20px rgba(255,45,120,0.3)' : 'none',
-                  transition: 'all 0.2s ease'
+                  flex: 1, padding: '12px', borderRadius: '100px',
+                  border: '2px solid #1a1a1a', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                  background: !freePlay ? '#0D0D0D' : '#fff',
+                  color: !freePlay ? '#fff' : '#555',
+                  boxShadow: !freePlay ? '3px 3px 0px #1DB954' : '2px 2px 0px #1a1a1a',
+                  transition: 'all 0.15s ease'
                 }}
               >
                 Contest Mode
@@ -267,13 +267,12 @@ export default function Home() {
               <button
                 onClick={() => { setFreePlay(true); setShowOnboarding(false) }}
                 style={{
-                  flex: 1, padding: '11px', borderRadius: '12px', border: 'none',
-                  fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                  background: freePlay ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(255,255,255,0.04)',
-                  color: freePlay ? '#fff' : 'var(--text-muted)',
-                  border: freePlay ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: freePlay ? '0 4px 20px rgba(34,197,94,0.3)' : 'none',
-                  transition: 'all 0.2s ease'
+                  flex: 1, padding: '12px', borderRadius: '100px',
+                  border: '2px solid #1a1a1a', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                  background: freePlay ? '#1DB954' : '#fff',
+                  color: freePlay ? '#fff' : '#555',
+                  boxShadow: freePlay ? '3px 3px 0px #1a1a1a' : '2px 2px 0px #1a1a1a',
+                  transition: 'all 0.15s ease'
                 }}
               >
                 Normal Mode
@@ -297,17 +296,17 @@ export default function Home() {
                 dangerouslySetInnerHTML={{ __html: walletStatus }} />
             )}
 
-            {/* Username setter — show only when wallet connected */}
+            {/* Username setter */}
             {userAddress && (
               <div style={{
                 marginTop: '14px', width: '100%', maxWidth: '460px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '14px', padding: '14px 16px',
-                display: 'flex', alignItems: 'center', gap: '10px'
+                background: '#fff', border: '2px solid #1a1a1a',
+                borderRadius: '14px', padding: '12px 16px',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                boxShadow: '3px 3px 0px #1a1a1a'
               }}>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap', fontWeight: 600 }}>
-                  {username ? '✓ Name:' : 'Set name:'}
+                <div style={{ fontSize: '11px', color: '#999', whiteSpace: 'nowrap', fontWeight: 700 }}>
+                  {username ? 'Name:' : 'Set name:'}
                 </div>
                 <input
                   value={usernameInput}
@@ -316,21 +315,21 @@ export default function Home() {
                   placeholder="Your display name..."
                   maxLength={20}
                   style={{
-                    flex: 1, background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    flex: 1, background: '#F5F5F0',
+                    border: '2px solid #e5e5e0',
                     borderRadius: '8px', padding: '7px 12px',
-                    fontSize: '12px', color: '#fff', outline: 'none',
-                    fontFamily: "'Space Grotesk', sans-serif"
+                    fontSize: '12px', color: '#0D0D0D', outline: 'none',
+                    fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600
                   }}
                 />
                 <button
                   onClick={saveUsername}
                   disabled={savingUsername || !usernameInput.trim()}
                   style={{
-                    padding: '7px 14px', borderRadius: '8px', border: 'none',
-                    fontSize: '11px', fontWeight: 700, cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #FF2D78, #8B5CF6)',
-                    color: '#fff', whiteSpace: 'nowrap',
+                    padding: '7px 14px', borderRadius: '8px',
+                    border: '2px solid #1a1a1a', fontSize: '11px', fontWeight: 700, cursor: 'pointer',
+                    background: '#1DB954', color: '#fff',
+                    boxShadow: '2px 2px 0px #1a1a1a',
                     opacity: !usernameInput.trim() ? 0.4 : 1
                   }}
                 >
