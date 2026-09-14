@@ -580,7 +580,7 @@ const Game = forwardRef(function Game({
             transition: 'all 0.15s ease', letterSpacing: '0.5px'
           }}
         >
-          {freePlay ? 'NORMAL MODE' : 'START GAME'}
+          {freePlay ? 'START GAME' : 'START GAME'}
         </button>
         <button
           onClick={() => { SoundEngine.play('click'); onShowOnboarding() }}
