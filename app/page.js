@@ -8,7 +8,6 @@ import GameOver from '@/components/GameOver'
 import Leaderboard from '@/components/Leaderboard'
 import Docs from '@/components/Docs'
 import { supabase, getWeekNumber } from '@/lib/supabase'
-import { SoundEngine } from '@/lib/sound'
 
 function getCountdown() {
   const now = new Date()
